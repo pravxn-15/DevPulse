@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="DevPulse Blog Application - Share your tech ideas, tutorials, and insights with the world. Built for Codomax Digital Solutions Internship.">
+  <title>DevPulse — Modern Tech & Developer Blog</title>
+
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container">
+      <a href="index.html" class="nav-brand" aria-label="DevPulse Homepage">
+        <div class="brand-icon">⚡</div>
+        <span>DevPulse</span>
+      </a>
+
+      <nav class="nav-menu" id="nav-menu">
+        <a href="index.html" class="nav-link active">Home</a>
+        <a href="login.html" class="nav-link">Login</a>
+        <a href="register.html" class="nav-link">Register</a>
+        <a href="dashboard.html" class="nav-link">Dashboard</a>
+        <a href="create-blog.html" class="nav-link">Create Blog</a>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="create-blog.html" class="btn btn-primary btn-sm">+ Write Post</a>
+        <button class="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+          ☰
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="container">
+        <div class="hero-grid">
+          <div class="hero-content">
+            <h1>Share Your Ideas <span>With The World</span></h1>
+            <p>
+              Join a vibrant community of developers, creators, and tech innovators. Publish insights, showcase
+              tutorials, and expand your technical footprint.
+            </p>
+            <div class="hero-cta">
+              <a href="create-blog.html" class="btn btn-primary btn-lg">Start Writing</a>
+              <a href="#featured-blogs" class="btn btn-secondary btn-lg">Explore Blogs ↓</a>
+            </div>
+          </div>
+
+          <div class="hero-visual">
+            <div class="hero-card-mock">
+              <div class="hero-card-header">
+                <span class="hero-card-tag">Featured Post</span>
+                <span style="font-size: 0.8rem; color: var(--text-muted);">5 min read</span>
+              </div>
+              <h3 class="hero-card-title">Building Scalable Web Applications with Modern Vanilla JavaScript</h3>
+              <p class="hero-card-excerpt">
+                Discover how clean architectural patterns and native web APIs enable lightning-fast user interfaces
+                without heavy dependency trees.
+              </p>
+              <div class="hero-card-author">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+                  alt="Alex Morgan" class="hero-author-avatar">
+                <div>
+                  <div style="font-weight: 700; font-size: 0.9rem;">Alex Morgan</div>
+                  <div style="font-size: 0.75rem; color: var(--text-muted);">Senior Frontend Engineer</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Search & Filter Bar Section -->
+    <section class="filter-section" id="featured-blogs">
+      <div class="container">
+        <div class="section-header">
+          <span class="tagline">Curated Articles</span>
+          <h2>Explore Trending Stories</h2>
+          <p>Filter by topics or use the search bar to find technical guides and career insights.</p>
+        </div>
+
+        <div class="search-filter-bar">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="home-search-input" placeholder="Search blogs by title, keywords, or topics...">
+          </div>
+
+          <div class="category-pills">
+            <button class="category-pill active" data-category="All">All Topics</button>
+            <button class="category-pill" data-category="Technology">Technology</button>
+            <button class="category-pill" data-category="Web Development">Web Development</button>
+            <button class="category-pill" data-category="Programming">Programming</button>
+            <button class="category-pill" data-category="Career">Career</button>
+            <button class="category-pill" data-category="Design">Design</button>
+            <button class="category-pill" data-category="Education">Education</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Blog Cards Grid -->
+    <section class="blogs-section">
+      <div class="container">
+        <div class="blog-grid" id="blog-cards-grid">
+          <!-- Dynamically populated by js/script.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Category Grid Section -->
+    <section class="categories-section">
+      <div class="container">
+        <div class="section-header">
+          <span class="tagline">Explore Topics</span>
+          <h2>Browse by Categories</h2>
+          <p>Discover articles tailored to your specific technical domain and career interests.</p>
+        </div>
+
+        <div class="category-grid">
+          <div class="category-card"
+            onclick="document.querySelector('[data-category=\'Technology\']').click(); location.href='#featured-blogs';">
+            <div class="category-icon">💻</div>
+            <h3>Technology</h3>
+            <p>AI, Cloud, and Software Innovations</p>
+          </div>
+
+          <div class="category-card"
+            onclick="document.querySelector('[data-category=\'Web Development\']').click(); location.href='#featured-blogs';">
+            <div class="category-icon">🌐</div>
+            <h3>Web Development</h3>
+            <p>HTML5, CSS Grid, JavaScript & APIs</p>
+          </div>
+
+          <div class="category-card"
+            onclick="document.querySelector('[data-category=\'Programming\']').click(); location.href='#featured-blogs';">
+            <div class="category-icon">⚡</div>
+            <h3>Programming</h3>
+            <p>Algorithms, Clean Code & Architecture</p>
+          </div>
+
+          <div class="category-card"
+            onclick="document.querySelector('[data-category=\'Career\']').click(); location.href='#featured-blogs';">
+            <div class="category-icon">🚀</div>
+            <h3>Career</h3>
+            <p>Internships, Resumes & Interview Prep</p>
+          </div>
+
+          <div class="category-card"
+            onclick="document.querySelector('[data-category=\'Design\']').click(); location.href='#featured-blogs';">
+            <div class="category-icon">🎨</div>
+            <h3>Design</h3>
+            <p>UI/UX, Glassmorphic Aesthetics & Systems</p>
+          </div>
+
+          <div class="category-card"
+            onclick="document.querySelector('[data-category=\'Education\']').click(); location.href='#featured-blogs';">
+            <div class="category-icon">📚</div>
+            <h3>Education</h3>
+            <p>Tutorials, Accessibility & Best Practices</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="nav-brand">
+            <div class="brand-icon">⚡</div>
+            <span>DevPulse</span>
+          </a>
+          <p>
+            A high-performance responsive blog platform built with semantic HTML5, modern CSS3, and vanilla JavaScript.
+          </p>
+          <div class="social-links">
+            <a href="#" class="social-icon" aria-label="GitHub">🐙</a>
+            <a href="#" class="social-icon" aria-label="LinkedIn">💼</a>
+            <a href="#" class="social-icon" aria-label="Twitter">🐦</a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4>Quick Links</h4>
+          <div class="footer-links">
+            <a href="index.html">Home</a>
+            <a href="login.html">Login</a>
+            <a href="register.html">Register</a>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="create-blog.html">Create Blog</a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4>Categories</h4>
+          <div class="footer-links">
+            <a href="#featured-blogs">Technology</a>
+            <a href="#featured-blogs">Web Development</a>
+            <a href="#featured-blogs">Programming</a>
+            <a href="#featured-blogs">Career</a>
+            <a href="#featured-blogs">Design</a>
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <p>&copy; 2026 DevPulse. Built with Vanilla Web Technologies.</p>
+        </div>
+      </div>
+  </footer>
+
+  <!-- Reusable JavaScript -->
+  <script src="js/script.js"></script>
+</body>
+
+</html>

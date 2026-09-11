@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Create an author account on DevPulse to publish technical articles and tutorials.">
+  <title>Register — DevPulse Blog Application</title>
+  
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container">
+      <a href="index.html" class="nav-brand" aria-label="DevPulse Homepage">
+        <div class="brand-icon">⚡</div>
+        <span>DevPulse</span>
+      </a>
+
+      <nav class="nav-menu" id="nav-menu">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="login.html" class="nav-link">Login</a>
+        <a href="register.html" class="nav-link active">Register</a>
+        <a href="dashboard.html" class="nav-link">Dashboard</a>
+        <a href="create-blog.html" class="nav-link">Create Blog</a>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="login.html" class="btn btn-outline btn-sm">Login</a>
+        <button class="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+          ☰
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Register Main Content -->
+  <main class="auth-page">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h1>Create Account</h1>
+        <p>Join DevPulse today to start sharing your technical knowledge</p>
+      </div>
+
+      <form id="register-form" novalidate>
+        <!-- Full Name -->
+        <div class="form-group">
+          <label for="fullname" class="form-label">Full Name</label>
+          <div class="input-wrapper">
+            <input type="text" id="fullname" class="form-input" placeholder="Alex Morgan" autocomplete="name" required>
+          </div>
+          <span class="form-error" id="name-error">Please enter your full name.</span>
+        </div>
+
+        <!-- Email Input -->
+        <div class="form-group">
+          <label for="email" class="form-label">Email Address</label>
+          <div class="input-wrapper">
+            <input type="email" id="email" class="form-input" placeholder="alex.morgan@example.com" autocomplete="email" required>
+          </div>
+          <span class="form-error" id="email-error">Please enter a valid email address.</span>
+        </div>
+
+        <!-- Password Input -->
+        <div class="form-group">
+          <label for="password" class="form-label">Password</label>
+          <div class="input-wrapper">
+            <input type="password" id="password" class="form-input" placeholder="Min. 6 characters" autocomplete="new-password" required>
+          </div>
+          <span class="form-error" id="password-error">Password must be at least 6 characters.</span>
+        </div>
+
+        <!-- Confirm Password Input -->
+        <div class="form-group">
+          <label for="confirm-password" class="form-label">Confirm Password</label>
+          <div class="input-wrapper">
+            <input type="password" id="confirm-password" class="form-input" placeholder="Re-enter password" autocomplete="new-password" required>
+          </div>
+          <span class="form-error" id="confirm-error">Passwords do not match.</span>
+        </div>
+
+        <!-- Terms & Conditions Checkbox -->
+        <div class="form-group">
+          <label class="checkbox-group">
+            <input type="checkbox" id="terms" required>
+            <span>I agree to the <a href="#" onclick="alert('Terms & Conditions: Respect community guidelines when publishing content.'); return false;">Terms & Conditions</a></span>
+          </label>
+          <span class="form-error" id="terms-error">You must accept the Terms & Conditions.</span>
+        </div>
+
+        <!-- Register Button -->
+        <button type="submit" class="btn btn-primary btn-block btn-lg">Create Account</button>
+      </form>
+
+      <div class="auth-footer">
+        Already have an account? <a href="login.html">Sign in here</a>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <p>&copy; 2026 DevPulse. Built with Vanilla Web Technologies for Codomax Internship Submission.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Reusable JavaScript -->
+  <script src="js/script.js"></script>
+</body>
+</html>

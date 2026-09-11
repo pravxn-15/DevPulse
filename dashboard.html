@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Author Dashboard on DevPulse - Monitor blog analytics, filter posts, and create new articles.">
+  <title>Author Dashboard — DevPulse Blog Application</title>
+  
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container">
+      <a href="index.html" class="nav-brand" aria-label="DevPulse Homepage">
+        <div class="brand-icon">⚡</div>
+        <span>DevPulse</span>
+      </a>
+
+      <nav class="nav-menu" id="nav-menu">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="login.html" class="nav-link">Login</a>
+        <a href="register.html" class="nav-link">Register</a>
+        <a href="dashboard.html" class="nav-link active">Dashboard</a>
+        <a href="create-blog.html" class="nav-link">Create Blog</a>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="create-blog.html" class="btn btn-primary btn-sm">+ New Post</a>
+        <button class="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+          ☰
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Dashboard Main Content -->
+  <main class="dashboard-section">
+    <div class="container">
+      
+      <!-- Welcome Profile Banner -->
+      <div class="dashboard-welcome">
+        <div class="user-profile-summary">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" alt="Alex Morgan" class="user-avatar-large">
+          <div class="user-info">
+            <h1>Welcome back, Alex Morgan 👋</h1>
+            <p>Author & Senior Frontend Engineer • <strong>Codomax Internship Platform</strong></p>
+          </div>
+        </div>
+        <div>
+          <a href="create-blog.html" class="btn btn-primary">+ Create New Article</a>
+        </div>
+      </div>
+
+      <!-- Stats Grid (4 Cards) -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-details">
+            <div class="stat-label">Total Articles</div>
+            <div class="stat-value" id="stat-total">0</div>
+          </div>
+          <div class="stat-icon-wrap indigo">📝</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-details">
+            <div class="stat-label">Published Posts</div>
+            <div class="stat-value" id="stat-published">0</div>
+          </div>
+          <div class="stat-icon-wrap green">🚀</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-details">
+            <div class="stat-label">Draft Posts</div>
+            <div class="stat-value" id="stat-drafts">0</div>
+          </div>
+          <div class="stat-icon-wrap amber">⏳</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-details">
+            <div class="stat-label">Total Article Views</div>
+            <div class="stat-value" id="stat-views">0</div>
+          </div>
+          <div class="stat-icon-wrap cyan">👁️</div>
+        </div>
+      </div>
+
+      <!-- My Blogs Section -->
+      <div class="dashboard-content-header">
+        <h2>My Articles</h2>
+        <div class="dashboard-actions">
+          <div class="search-box" style="flex: 0 1 240px;">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="dashboard-search-input" placeholder="Search my blogs...">
+          </div>
+
+          <select id="dashboard-status-filter" class="filter-select" aria-label="Filter posts by status">
+            <option value="All">All Statuses</option>
+            <option value="Published">Published</option>
+            <option value="Draft">Draft</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Desktop Table View -->
+      <div class="table-responsive">
+        <table class="dashboard-table">
+          <thead>
+            <tr>
+              <th>Blog Title</th>
+              <th>Category</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Views</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="dashboard-table-body">
+            <!-- Dynamically populated by js/script.js -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Mobile Card Layout (< 768px) -->
+      <div class="dashboard-mobile-cards" id="dashboard-mobile-cards">
+        <!-- Dynamically populated by js/script.js -->
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <p>&copy; 2026 DevPulse. Built with Vanilla Web Technologies for Codomax Internship Submission.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Reusable JavaScript -->
+  <script src="js/script.js"></script>
+</body>
+</html>

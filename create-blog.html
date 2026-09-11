@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Create and publish new technical articles on DevPulse blog platform.">
+  <title>Create Blog Post — DevPulse</title>
+  
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container">
+      <a href="index.html" class="nav-brand" aria-label="DevPulse Homepage">
+        <div class="brand-icon">⚡</div>
+        <span>DevPulse</span>
+      </a>
+
+      <nav class="nav-menu" id="nav-menu">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="login.html" class="nav-link">Login</a>
+        <a href="register.html" class="nav-link">Register</a>
+        <a href="dashboard.html" class="nav-link">Dashboard</a>
+        <a href="create-blog.html" class="nav-link active">Create Blog</a>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="dashboard.html" class="btn btn-secondary btn-sm">← Back to Dashboard</a>
+        <button class="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+          ☰
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Create Blog Main Content -->
+  <main class="create-blog-section">
+    <div class="container">
+      <div style="margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h1 style="font-size: 2rem;">Create New Article</h1>
+          <p style="color: var(--text-muted);">Draft and publish your blog post to the DevPulse developer community.</p>
+        </div>
+        <div style="display: flex; gap: 0.75rem;">
+          <button type="button" class="btn btn-secondary" id="preview-blog-btn">👁️ Live Preview</button>
+          <button type="button" class="btn btn-secondary" id="save-draft-btn">💾 Save Draft</button>
+        </div>
+      </div>
+
+      <form id="create-blog-form" novalidate>
+        <div class="editor-grid">
+          
+          <!-- Main Form Column -->
+          <div class="editor-main">
+            <!-- Article Title -->
+            <div class="form-group">
+              <label for="blog-title" class="form-label">Blog Title *</label>
+              <input type="text" id="blog-title" class="form-input" placeholder="e.g. Master CSS Grid & Flexbox in 2026" required>
+            </div>
+
+            <!-- Short Description -->
+            <div class="form-group">
+              <label for="blog-description" class="form-label">Short Summary / Description *</label>
+              <textarea id="blog-description" class="form-input" rows="3" maxlength="200" placeholder="A concise summary of your post that appears on article cards..." required></textarea>
+              <div class="char-counter" id="desc-char-count">0 / 200 characters</div>
+            </div>
+
+            <!-- Blog Content Textarea -->
+            <div class="form-group">
+              <label for="blog-content" class="form-label">Full Article Content *</label>
+              <textarea id="blog-content" class="form-input" rows="12" placeholder="Write your full blog post content here... Supports standard paragraphs and line breaks." required></textarea>
+            </div>
+          </div>
+
+          <!-- Sidebar Form Column -->
+          <div class="editor-sidebar">
+            
+            <!-- Publishing Settings Card -->
+            <div class="editor-sidebar-card">
+              <h3>Post Settings</h3>
+              
+              <!-- Category Select -->
+              <div class="form-group">
+                <label for="blog-category" class="form-label">Category *</label>
+                <select id="blog-category" class="filter-select" style="width: 100%;" required>
+                  <option value="Technology">Technology</option>
+                  <option value="Web Development">Web Development</option>
+                  <option value="Programming">Programming</option>
+                  <option value="Career">Career</option>
+                  <option value="Design">Design</option>
+                  <option value="Education">Education</option>
+                </select>
+              </div>
+
+              <!-- Publish Status -->
+              <div class="form-group">
+                <label for="publish-status" class="form-label">Status</label>
+                <select id="publish-status" class="filter-select" style="width: 100%;">
+                  <option value="Published">Publish Immediately</option>
+                  <option value="Draft">Save as Draft</option>
+                </select>
+              </div>
+
+              <!-- Tags Input -->
+              <div class="form-group">
+                <label for="blog-tags" class="form-label">Tags (comma separated)</label>
+                <input type="text" id="blog-tags" class="form-input" placeholder="e.g. JavaScript, CSS, WebDev">
+              </div>
+            </div>
+
+            <!-- Featured Image Card -->
+            <div class="editor-sidebar-card">
+              <h3>Featured Cover Image</h3>
+              <div class="form-group">
+                <label for="blog-image-url" class="form-label">Image URL</label>
+                <input type="url" id="blog-image-url" class="form-input" placeholder="https://images.unsplash.com/...">
+              </div>
+              <div class="image-preview-box" id="image-preview-container">
+                <span>Image Preview</span>
+              </div>
+            </div>
+
+            <!-- Action Buttons Card -->
+            <div class="editor-sidebar-card">
+              <button type="submit" class="btn btn-primary btn-block btn-lg" id="publish-blog-btn">🚀 Publish Article</button>
+              <button type="button" class="btn btn-secondary btn-block" style="margin-top: 0.75rem;" onclick="location.href='dashboard.html';">Cancel</button>
+            </div>
+
+          </div>
+
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <p>&copy; 2026 DevPulse. Built with Vanilla Web Technologies for Codomax Internship Submission.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Reusable JavaScript -->
+  <script src="js/script.js"></script>
+</body>
+</html>
