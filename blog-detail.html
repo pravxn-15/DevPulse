@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Read full technical article on DevPulse Blog Application.">
+  <title>Article Details — DevPulse</title>
+
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container">
+      <a href="index.html" class="nav-brand" aria-label="DevPulse Homepage">
+        <div class="brand-icon">⚡</div>
+        <span>DevPulse</span>
+      </a>
+
+      <nav class="nav-menu" id="nav-menu">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="login.html" class="nav-link">Login</a>
+        <a href="register.html" class="nav-link">Register</a>
+        <a href="dashboard.html" class="nav-link">Dashboard</a>
+        <a href="create-blog.html" class="nav-link">Create Blog</a>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="index.html" class="btn btn-secondary btn-sm">← Back to Explore</a>
+        <button class="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+          ☰
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Article Detail Main Content -->
+  <main style="padding: 3rem 0 5rem 0;">
+    <div class="container" style="max-width: 860px;">
+      
+      <!-- Back Link -->
+      <div style="margin-bottom: 2rem;">
+        <a href="index.html" style="color: var(--primary); text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem;">
+          ← Back to All Articles
+        </a>
+      </div>
+
+      <!-- Article Container Card -->
+      <article id="article-detail-container" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: 2.5rem; box-shadow: var(--shadow-md);">
+        
+        <div style="text-align: center; padding: 3rem 1rem;">
+          <div style="font-size: 2rem; margin-bottom: 1rem;">⏳</div>
+          <p style="color: var(--text-muted);">Loading article details...</p>
+        </div>
+
+      </article>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <p>&copy; 2026 DevPulse. Built with Vanilla Web Technologies & Node.js Express REST API.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Reusable JavaScript -->
+  <script src="js/script.js"></script>
+</body>
+
+</html>

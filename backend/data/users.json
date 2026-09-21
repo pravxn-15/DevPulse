@@ -1,0 +1,23 @@
+[
+  {
+    "id": "user_1",
+    "name": "Alex Morgan",
+    "email": "alex.morgan@example.com",
+    "password": "password123",
+    "createdAt": "2026-09-01T10:00:00.000Z"
+  },
+  {
+    "id": "user_1789652392997",
+    "name": "Praveen",
+    "email": "praveen@example.com",
+    "password": "password123",
+    "createdAt": "2026-09-17T13:39:52.997Z"
+  },
+  {
+    "id": "user_1789652553279",
+    "name": "praveen",
+    "email": "praveen9345561356@gmail.com",
+    "password": "Praveen@11",
+    "createdAt": "2026-09-17T13:42:33.279Z"
+  }
+]

@@ -1,0 +1,25 @@
+{
+  "name": "blog-backend",
+  "version": "1.0.0",
+  "description": "Express Node.js REST API Backend for DevPulse Blog Application",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "express",
+    "nodejs",
+    "rest-api",
+    "blog"
+  ],
+  "author": "Codomax Intern",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
+    "express": "^4.18.2",
+    "mongoose": "^9.10.1"
+  }
+}

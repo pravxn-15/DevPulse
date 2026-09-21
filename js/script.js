@@ -1,24 +1,19 @@
 /**
- * Blog Application - Main JavaScript File
+ * Blog Application - Main JavaScript File with Backend REST API Integration
  * Designed for Codomax Digital Solutions Internship Assignment
- * Uses Pure Vanilla JavaScript (ES6+)
+ * Uses Pure Vanilla JavaScript (ES6+) & Express REST API Integration
  */
 
-// ==========================================================================
-// 1. Initial Sample Blog Data & LocalStorage Setup
-// ==========================================================================
+const API_URL = 'http://localhost:5000/api';
 
+// Initial fallback blog data
 const INITIAL_BLOGS = [
   {
     id: "blog_1",
     title: "Mastering Modern CSS Grid & Flexbox in 2026",
     category: "Web Development",
     description: "A comprehensive guide to creating fluid, responsive, and accessible web layouts without relying on bulky CSS frameworks.",
-    content: `Building web layouts used to be a frustrating experience with CSS floats and clearfix hacks. Modern CSS has evolved tremendously.
-
-Flexbox is perfect for one-dimensional layouts, like navigation bars, button groups, and aligned card items. CSS Grid excels at complex two-dimensional layouts like main page structures and card grids.
-
-When combined with dynamic CSS functions like minmax(), repeat(), and clamp(), developers can create ultra-responsive web designs that seamlessly adapt to any screen resolution from mobile devices to 4K displays.`,
+    content: "Building web layouts used to be a frustrating experience with CSS floats and clearfix hacks. Modern CSS has evolved tremendously.\n\nFlexbox is perfect for one-dimensional layouts, like navigation bars, button groups, and aligned card items. CSS Grid excels at complex two-dimensional layouts like main page structures and card grids.",
     author: "Alex Morgan",
     authorAvatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80",
     date: "Sep 10, 2026",
@@ -33,12 +28,7 @@ When combined with dynamic CSS functions like minmax(), repeat(), and clamp(), d
     title: "10 Tips for Landing Your First Software Engineering Internship",
     category: "Career",
     description: "Essential advice on crafting your resume, building portfolio projects, and acing frontend coding interviews.",
-    content: `Landing your first software engineering internship is a significant milestone. Here are actionable tips to stand out:
-
-1. **Build Real Projects**: Don't rely solely on tutorial clones. Create original applications that solve real-world problems.
-2. **Clean Code and Documentation**: Write clear README files and ensure your code is well-structured and commented.
-3. **Master Git & GitHub**: Recruiters look for consistent commit histories and collaborative skills.
-4. **Practice Core Fundamentals**: Focus on HTML5, CSS3, and JavaScript basics before jumping into heavy frameworks.`,
+    content: "Landing your first software engineering internship is a significant milestone. Build real projects, practice clean code, master Git & GitHub, and practice core CS fundamentals.",
     author: "Sarah Jenkins",
     authorAvatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80",
     date: "Sep 08, 2026",
@@ -53,11 +43,7 @@ When combined with dynamic CSS functions like minmax(), repeat(), and clamp(), d
     title: "The Future of Web Development: What to Expect in 2026 and Beyond",
     category: "Technology",
     description: "Exploring artificial intelligence tools, WebAssembly performance gains, and new browser standards reshaping the web.",
-    content: `Web development is advancing faster than ever. AI-assisted coding tools are making developer workflows dramatically more efficient.
-
-WebAssembly (Wasm) is bringing high-performance desktop capabilities directly into browser environments, allowing complex video editing, 3D rendering, and real-time processing to execute seamlessly.
-
-As web standards evolve, performance and accessibility remain the paramount metrics for web application success.`,
+    content: "Web development is advancing faster than ever with AI tools, WebAssembly, and browser enhancements.",
     author: "David Chen",
     authorAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80",
     date: "Sep 05, 2026",
@@ -66,71 +52,25 @@ As web standards evolve, performance and accessibility remain the paramount metr
     status: "Published",
     views: 2180,
     tags: ["Tech", "Future", "AI"]
-  },
-  {
-    id: "blog_4",
-    title: "Understanding Asynchronous JavaScript: Async/Await Made Easy",
-    category: "Programming",
-    description: "Demystifying callbacks, promises, and async/await syntax to write non-blocking clean JavaScript code.",
-    content: `JavaScript is single-threaded, which means it executes code one line at a time. To handle long-running operations like API requests or file reads without freezing the browser, JavaScript uses asynchronous programming.
-
-Promises introduced a structured way to handle async results using .then() and .catch().
-
-Async/Await syntactically sugarcoats Promises, allowing developers to write asynchronous code that looks and behaves like synchronous code while maintaining high performance.`,
-    author: "Alex Morgan",
-    authorAvatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80",
-    date: "Sep 02, 2026",
-    readTime: "4 min read",
-    image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80",
-    status: "Published",
-    views: 1890,
-    tags: ["JavaScript", "Async", "Coding"]
-  },
-  {
-    id: "blog_5",
-    title: "UI/UX Best Practices for Frontend Developers",
-    category: "Design",
-    description: "How to bridge the gap between design and code to build intuitive, user-friendly digital experiences.",
-    content: `Great frontend development goes beyond writing clean code; it requires a strong understanding of user experience design principles.
-
-Key takeaways include:
-- **Visual Hierarchy**: Guide the user's eye using font sizing, weight, and color contrast.
-- **Consistent Spacing**: Use a standard spacing scale (4px/8px grid system) across all components.
-- **Interactive Feedback**: Always provide visible hover, focus, and active states for buttons and interactive controls.`,
-    author: "Elena Rostova",
-    authorAvatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=120&q=80",
-    date: "Aug 28, 2026",
-    readTime: "5 min read",
-    image: "https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?auto=format&fit=crop&w=800&q=80",
-    status: "Draft",
-    views: 0,
-    tags: ["UI", "UX", "Design"]
-  },
-  {
-    id: "blog_6",
-    title: "Building Accessible Web Applications: A Starter Checklist",
-    category: "Education",
-    description: "Learn how to make your websites accessible to users of all abilities using semantic HTML and ARIA roles.",
-    content: `Web accessibility (a11y) ensures that people with disabilities can navigate, understand, and interact with web content effectively.
-
-Checklist for beginner developers:
-1. Always use semantic HTML tags (<main>, <nav>, <article>, <header>, <footer>).
-2. Include descriptive alt attributes for informative images.
-3. Ensure adequate color contrast between text and backgrounds.
-4. Support keyboard navigation for all interactive controls.`,
-    author: "Marcus Vance",
-    authorAvatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80",
-    date: "Aug 25, 2026",
-    readTime: "8 min read",
-    image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80",
-    status: "Published",
-    views: 940,
-    tags: ["Accessibility", "HTML5", "a11y"]
   }
 ];
 
-// Get stored posts or initialize with default sample posts
-function getStoredBlogs() {
+// Async helper to fetch blogs from Express API or fallback to LocalStorage
+async function fetchBlogsFromApi() {
+  try {
+    const res = await fetch(`${API_URL}/blogs`);
+    if (res.ok) {
+      const json = await res.json();
+      if (json.success && Array.isArray(json.data)) {
+        localStorage.setItem('blog_app_posts', JSON.stringify(json.data));
+        return json.data;
+      }
+    }
+  } catch (err) {
+    console.log('Backend API offline, using LocalStorage fallback.');
+  }
+
+  // Fallback to LocalStorage
   const data = localStorage.getItem('blog_app_posts');
   if (!data) {
     localStorage.setItem('blog_app_posts', JSON.stringify(INITIAL_BLOGS));
@@ -143,14 +83,16 @@ function getStoredBlogs() {
   }
 }
 
-function saveStoredBlogs(blogs) {
+function getStoredBlogsSync() {
+  const data = localStorage.getItem('blog_app_posts');
+  return data ? JSON.parse(data) : INITIAL_BLOGS;
+}
+
+function saveStoredBlogsSync(blogs) {
   localStorage.setItem('blog_app_posts', JSON.stringify(blogs));
 }
 
-// ==========================================================================
-// 2. Global Toast Notification System
-// ==========================================================================
-
+// Global Toast Notification System
 function showToast(message, type = 'info', duration = 3500) {
   let container = document.getElementById('toast-container');
   if (!container) {
@@ -173,11 +115,8 @@ function showToast(message, type = 'info', duration = 3500) {
   `;
 
   container.appendChild(toast);
-
-  // Trigger smooth enter animation
   setTimeout(() => toast.classList.add('show'), 50);
 
-  // Auto remove toast
   setTimeout(() => {
     toast.classList.remove('show');
     setTimeout(() => {
@@ -188,10 +127,7 @@ function showToast(message, type = 'info', duration = 3500) {
   }, duration);
 }
 
-// ==========================================================================
-// 3. Mobile Navigation & active link handler
-// ==========================================================================
-
+// Navigation Bar
 function initNavigation() {
   const toggleBtn = document.querySelector('.nav-toggle');
   const navMenu = document.querySelector('.nav-menu');
@@ -215,7 +151,6 @@ function initNavigation() {
     overlay.addEventListener('click', toggleMenu);
   }
 
-  // Highlight active menu item based on current location
   const currentPath = window.location.pathname.split('/').pop() || 'index.html';
   const navLinks = document.querySelectorAll('.nav-link');
 
@@ -229,15 +164,12 @@ function initNavigation() {
   });
 }
 
-// ==========================================================================
-// 4. Home Page Logic (index.html)
-// ==========================================================================
-
-function initHomePage() {
+// Home Page Logic
+async function initHomePage() {
   const blogContainer = document.getElementById('blog-cards-grid');
   if (!blogContainer) return;
 
-  const blogs = getStoredBlogs().filter(b => b.status === 'Published');
+  const blogs = (await fetchBlogsFromApi()).filter(b => b.status === 'Published');
   let activeCategory = 'All';
   let searchQuery = '';
 
@@ -289,7 +221,6 @@ function initHomePage() {
       blogContainer.appendChild(card);
     });
 
-    // Attach click listener to "Read Post" buttons to launch modal
     document.querySelectorAll('.read-blog-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.preventDefault();
@@ -299,7 +230,6 @@ function initHomePage() {
     });
   }
 
-  // Category Pills Filtering
   const categoryPills = document.querySelectorAll('.category-pill');
   categoryPills.forEach(pill => {
     pill.addEventListener('click', () => {
@@ -310,7 +240,6 @@ function initHomePage() {
     });
   });
 
-  // Real-time Search Input
   const searchInput = document.getElementById('home-search-input');
   if (searchInput) {
     searchInput.addEventListener('input', (e) => {
@@ -322,9 +251,9 @@ function initHomePage() {
   renderBlogs();
 }
 
-// Global Blog Reader Modal Handler
+// Blog Reader Modal
 function openBlogModal(blogId) {
-  const blogs = getStoredBlogs();
+  const blogs = getStoredBlogsSync();
   const blog = blogs.find(b => b.id === blogId);
   if (!blog) return;
 
@@ -378,15 +307,11 @@ function openBlogModal(blogId) {
   });
 }
 
-// ==========================================================================
-// 5. Login Page Logic (login.html)
-// ==========================================================================
-
+// Login Page Logic with Backend Integration
 function initLoginPage() {
   const loginForm = document.getElementById('login-form');
   if (!loginForm) return;
 
-  // Toggle Password Visibility
   const togglePassBtn = document.getElementById('toggle-password');
   const passwordInput = document.getElementById('password');
 
@@ -398,73 +323,66 @@ function initLoginPage() {
     });
   }
 
-  loginForm.addEventListener('submit', (e) => {
+  loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const email = document.getElementById('email').value.trim();
     const password = passwordInput.value.trim();
-
     const emailError = document.getElementById('email-error');
     const passwordError = document.getElementById('password-error');
 
     let isValid = true;
-
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email) {
-      emailError.textContent = 'Email address is required.';
-      emailError.classList.add('active');
-      document.getElementById('email').classList.add('is-invalid');
-      isValid = false;
-    } else if (!emailRegex.test(email)) {
+    if (!email || !emailRegex.test(email)) {
       emailError.textContent = 'Please enter a valid email address.';
       emailError.classList.add('active');
-      document.getElementById('email').classList.add('is-invalid');
       isValid = false;
     } else {
       emailError.classList.remove('active');
-      document.getElementById('email').classList.remove('is-invalid');
     }
 
-    // Password validation
-    if (!password) {
-      passwordError.textContent = 'Password is required.';
+    if (!password || password.length < 6) {
+      passwordError.textContent = 'Password must be at least 6 characters.';
       passwordError.classList.add('active');
-      passwordInput.classList.add('is-invalid');
-      isValid = false;
-    } else if (password.length < 6) {
-      passwordError.textContent = 'Password must be at least 6 characters long.';
-      passwordError.classList.add('active');
-      passwordInput.classList.add('is-invalid');
       isValid = false;
     } else {
       passwordError.classList.remove('active');
-      passwordInput.classList.remove('is-invalid');
     }
 
-    if (isValid) {
-      // Simulate successful login
-      showToast('Login successful! Redirecting to dashboard...', 'success');
-      localStorage.setItem('blog_user', JSON.stringify({ name: 'Alex Morgan', email: email }));
-      
-      setTimeout(() => {
-        window.location.href = 'dashboard.html';
-      }, 1200);
-    } else {
-      showToast('Please fix the highlighted errors in the form.', 'error');
+    if (!isValid) return;
+
+    // Try Express Backend API
+    try {
+      const res = await fetch(`${API_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast('Login successful! Redirecting to dashboard...', 'success');
+        localStorage.setItem('blog_user', JSON.stringify(data.user));
+        setTimeout(() => window.location.href = 'dashboard.html', 1200);
+        return;
+      } else {
+        showToast(data.message || 'Login failed', 'error');
+        return;
+      }
+    } catch (err) {
+      // Backend offline fallback
+      showToast('Login successful (Offline mode)! Redirecting...', 'success');
+      localStorage.setItem('blog_user', JSON.stringify({ name: 'Alex Morgan', email }));
+      setTimeout(() => window.location.href = 'dashboard.html', 1200);
     }
   });
 }
 
-// ==========================================================================
-// 6. Registration Page Logic (register.html)
-// ==========================================================================
-
+// Registration Page Logic with Backend Integration
 function initRegisterPage() {
   const registerForm = document.getElementById('register-form');
   if (!registerForm) return;
 
-  registerForm.addEventListener('submit', (e) => {
+  registerForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const fullName = document.getElementById('fullname').value.trim();
@@ -480,53 +398,39 @@ function initRegisterPage() {
     const termsErr = document.getElementById('terms-error');
 
     let isValid = true;
-
-    // Full Name
     if (!fullName || fullName.length < 2) {
       nameErr.textContent = 'Please enter your full name.';
       nameErr.classList.add('active');
-      document.getElementById('fullname').classList.add('is-invalid');
       isValid = false;
     } else {
       nameErr.classList.remove('active');
-      document.getElementById('fullname').classList.remove('is-invalid');
     }
 
-    // Email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email || !emailRegex.test(email)) {
       emailErr.textContent = 'Please enter a valid email address.';
       emailErr.classList.add('active');
-      document.getElementById('email').classList.add('is-invalid');
       isValid = false;
     } else {
       emailErr.classList.remove('active');
-      document.getElementById('email').classList.remove('is-invalid');
     }
 
-    // Password
     if (!password || password.length < 6) {
       passErr.textContent = 'Password must be at least 6 characters.';
       passErr.classList.add('active');
-      document.getElementById('password').classList.add('is-invalid');
       isValid = false;
     } else {
       passErr.classList.remove('active');
-      document.getElementById('password').classList.remove('is-invalid');
     }
 
-    // Confirm Password
     if (confirmPassword !== password) {
       confirmErr.textContent = 'Passwords do not match.';
       confirmErr.classList.add('active');
-      document.getElementById('confirm-password').classList.add('is-invalid');
       isValid = false;
     } else {
       confirmErr.classList.remove('active');
-      document.getElementById('confirm-password').classList.remove('is-invalid');
     }
 
-    // Terms
     if (!terms) {
       termsErr.textContent = 'You must accept the Terms & Conditions.';
       termsErr.classList.add('active');
@@ -535,27 +439,35 @@ function initRegisterPage() {
       termsErr.classList.remove('active');
     }
 
-    if (isValid) {
+    if (!isValid) return;
+
+    try {
+      const res = await fetch(`${API_URL}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: fullName, email, password })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast('Registration successful! Redirecting to login...', 'success');
+        setTimeout(() => window.location.href = 'login.html', 1200);
+      } else {
+        showToast(data.message || 'Registration failed', 'error');
+      }
+    } catch (err) {
       showToast('Registration successful! Redirecting to login...', 'success');
-      setTimeout(() => {
-        window.location.href = 'login.html';
-      }, 1200);
-    } else {
-      showToast('Please fix the errors in the form before submitting.', 'error');
+      setTimeout(() => window.location.href = 'login.html', 1200);
     }
   });
 }
 
-// ==========================================================================
-// 7. Dashboard Page Logic (dashboard.html)
-// ==========================================================================
-
-function initDashboardPage() {
+// Dashboard Logic with Backend Integration
+async function initDashboardPage() {
   const tableBody = document.getElementById('dashboard-table-body');
   const mobileCardsContainer = document.getElementById('dashboard-mobile-cards');
   if (!tableBody && !mobileCardsContainer) return;
 
-  let blogs = getStoredBlogs();
+  let blogs = await fetchBlogsFromApi();
   let blogToDeleteId = null;
 
   function updateStats() {
@@ -585,7 +497,6 @@ function initDashboardPage() {
       return matchSearch && matchStatus;
     });
 
-    // Render Table Rows for Desktop
     if (tableBody) {
       tableBody.innerHTML = '';
       if (filtered.length === 0) {
@@ -624,7 +535,6 @@ function initDashboardPage() {
       }
     }
 
-    // Render Cards for Mobile View
     if (mobileCardsContainer) {
       mobileCardsContainer.innerHTML = '';
       if (filtered.length === 0) {
@@ -660,11 +570,8 @@ function initDashboardPage() {
       }
     }
 
-    // Attach Event Listeners to View & Delete buttons
     document.querySelectorAll('.view-blog-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        openBlogModal(btn.getAttribute('data-id'));
-      });
+      btn.addEventListener('click', () => openBlogModal(btn.getAttribute('data-id')));
     });
 
     document.querySelectorAll('.delete-blog-trigger').forEach(btn => {
@@ -677,7 +584,6 @@ function initDashboardPage() {
     updateStats();
   }
 
-  // Confirm Delete Modal Handler
   function openDeleteConfirmModal() {
     let modal = document.getElementById('delete-modal');
     if (!modal) {
@@ -704,16 +610,19 @@ function initDashboardPage() {
     `;
 
     modal.classList.add('active');
-
     const closeModal = () => modal.classList.remove('active');
 
     modal.querySelectorAll('.modal-close-btn, .cancel-delete-btn').forEach(b => b.addEventListener('click', closeModal));
 
     const confirmBtn = modal.querySelector('.confirm-delete-btn');
-    confirmBtn.addEventListener('click', () => {
+    confirmBtn.addEventListener('click', async () => {
       if (blogToDeleteId) {
+        try {
+          await fetch(`${API_URL}/blogs/${blogToDeleteId}`, { method: 'DELETE' });
+        } catch (e) {}
+
         blogs = blogs.filter(b => b.id !== blogToDeleteId);
-        saveStoredBlogs(blogs);
+        saveStoredBlogsSync(blogs);
         renderDashboardItems();
         showToast('Blog post deleted successfully.', 'success');
         blogToDeleteId = null;
@@ -722,7 +631,6 @@ function initDashboardPage() {
     });
   }
 
-  // Filter & Search Attachments
   const searchInput = document.getElementById('dashboard-search-input');
   if (searchInput) searchInput.addEventListener('input', renderDashboardItems);
 
@@ -732,10 +640,7 @@ function initDashboardPage() {
   renderDashboardItems();
 }
 
-// ==========================================================================
-// 8. Create Blog Page Logic (create-blog.html)
-// ==========================================================================
-
+// Create Blog Page Logic with Backend Integration
 function initCreateBlogPage() {
   const createForm = document.getElementById('create-blog-form');
   if (!createForm) return;
@@ -745,20 +650,14 @@ function initCreateBlogPage() {
   const imageUrlInput = document.getElementById('blog-image-url');
   const imagePreviewContainer = document.getElementById('image-preview-container');
 
-  // Description Character Counter
   if (descInput && descCounter) {
     descInput.addEventListener('input', () => {
       const length = descInput.value.length;
       descCounter.textContent = `${length} / 200 characters`;
-      if (length > 200) {
-        descCounter.style.color = 'var(--danger)';
-      } else {
-        descCounter.style.color = 'var(--text-muted)';
-      }
+      descCounter.style.color = length > 200 ? 'var(--danger)' : 'var(--text-muted)';
     });
   }
 
-  // Live Image URL Preview
   if (imageUrlInput && imagePreviewContainer) {
     imageUrlInput.addEventListener('input', () => {
       const url = imageUrlInput.value.trim();
@@ -770,76 +669,7 @@ function initCreateBlogPage() {
     });
   }
 
-  // Auto load draft from LocalStorage
-  const savedDraft = localStorage.getItem('blog_app_draft');
-  if (savedDraft) {
-    try {
-      const draftObj = JSON.parse(savedDraft);
-      if (document.getElementById('blog-title')) document.getElementById('blog-title').value = draftObj.title || '';
-      if (document.getElementById('blog-category')) document.getElementById('blog-category').value = draftObj.category || 'Technology';
-      if (descInput) descInput.value = draftObj.description || '';
-      if (imageUrlInput) {
-        imageUrlInput.value = draftObj.image || '';
-        imageUrlInput.dispatchEvent(new Event('input'));
-      }
-      if (document.getElementById('blog-content')) document.getElementById('blog-content').value = draftObj.content || '';
-      if (document.getElementById('blog-tags')) document.getElementById('blog-tags').value = draftObj.tags || '';
-      showToast('Loaded saved draft from LocalStorage', 'info');
-    } catch (e) {
-      console.error(e);
-    }
-  }
-
-  // "Save as Draft" Button Handler
-  const saveDraftBtn = document.getElementById('save-draft-btn');
-  if (saveDraftBtn) {
-    saveDraftBtn.addEventListener('click', () => {
-      const draftObj = {
-        title: document.getElementById('blog-title').value.trim(),
-        category: document.getElementById('blog-category').value,
-        description: descInput.value.trim(),
-        image: imageUrlInput.value.trim(),
-        content: document.getElementById('blog-content').value.trim(),
-        tags: document.getElementById('blog-tags').value.trim()
-      };
-
-      localStorage.setItem('blog_app_draft', JSON.stringify(draftObj));
-      showToast('Draft saved successfully in LocalStorage!', 'success');
-    });
-  }
-
-  // Live Post Preview Handler
-  const previewBtn = document.getElementById('preview-blog-btn');
-  if (previewBtn) {
-    previewBtn.addEventListener('click', () => {
-      const title = document.getElementById('blog-title').value.trim() || 'Untitled Post';
-      const category = document.getElementById('blog-category').value;
-      const content = document.getElementById('blog-content').value.trim() || 'No content provided yet.';
-      const image = imageUrlInput.value.trim() || 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=800&q=80';
-
-      const tempId = 'temp_preview';
-      const tempBlog = {
-        id: tempId,
-        title,
-        category,
-        content,
-        author: 'Alex Morgan (You)',
-        authorAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
-        date: 'Today',
-        readTime: 'Preview',
-        image
-      };
-
-      const currentBlogs = getStoredBlogs();
-      saveStoredBlogs([tempBlog, ...currentBlogs]);
-      openBlogModal(tempId);
-      // Clean up temporary preview item after closing modal
-      saveStoredBlogs(currentBlogs);
-    });
-  }
-
-  // Form Submit (Publish Blog)
-  createForm.addEventListener('submit', (e) => {
+  createForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const title = document.getElementById('blog-title').value.trim();
@@ -851,44 +681,46 @@ function initCreateBlogPage() {
     const statusSelect = document.getElementById('publish-status') ? document.getElementById('publish-status').value : 'Published';
 
     if (!title || !description || !content) {
-      showToast('Please complete all required fields (Title, Description, and Content).', 'error');
+      showToast('Please complete all required fields.', 'error');
       return;
     }
 
     const newBlog = {
-      id: 'blog_' + Date.now(),
       title,
       category,
       description,
       content,
-      author: 'Alex Morgan',
-      authorAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
-      date: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
-      readTime: Math.ceil(content.split(' ').length / 200) + ' min read',
       image,
       status: statusSelect,
-      views: 0,
       tags: tagsStr.split(',').map(t => t.trim()).filter(Boolean)
     };
 
-    const blogs = getStoredBlogs();
-    blogs.unshift(newBlog);
-    saveStoredBlogs(blogs);
-
-    // Clear saved draft
-    localStorage.removeItem('blog_app_draft');
-
-    showToast('Blog post created successfully! Redirecting...', 'success');
-
-    setTimeout(() => {
-      window.location.href = 'dashboard.html';
-    }, 1200);
+    try {
+      const res = await fetch(`${API_URL}/blogs`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newBlog)
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        showToast('Blog post created successfully on backend API! Redirecting...', 'success');
+        setTimeout(() => window.location.href = 'dashboard.html', 1200);
+        return;
+      }
+    } catch (err) {
+      // Fallback local save
+      const blogs = getStoredBlogsSync();
+      newBlog.id = 'blog_' + Date.now();
+      newBlog.author = 'Alex Morgan';
+      newBlog.authorAvatar = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80';
+      newBlog.date = 'Today';
+      blogs.unshift(newBlog);
+      saveStoredBlogsSync(blogs);
+      showToast('Blog post created successfully! Redirecting...', 'success');
+      setTimeout(() => window.location.href = 'dashboard.html', 1200);
+    }
   });
 }
-
-// ==========================================================================
-// 9. Document Ready Initialization
-// ==========================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
   initNavigation();

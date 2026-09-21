@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Create and publish new technical articles on DevPulse blog platform.">
   <title>Create Blog Post — DevPulse</title>
-  
+
   <!-- CSS Stylesheet -->
   <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
   <!-- Navigation Bar -->
@@ -39,7 +41,8 @@
   <!-- Create Blog Main Content -->
   <main class="create-blog-section">
     <div class="container">
-      <div style="margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+      <div
+        style="margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
         <div>
           <h1 style="font-size: 2rem;">Create New Article</h1>
           <p style="color: var(--text-muted);">Draft and publish your blog post to the DevPulse developer community.</p>
@@ -52,36 +55,40 @@
 
       <form id="create-blog-form" novalidate>
         <div class="editor-grid">
-          
+
           <!-- Main Form Column -->
           <div class="editor-main">
             <!-- Article Title -->
             <div class="form-group">
               <label for="blog-title" class="form-label">Blog Title *</label>
-              <input type="text" id="blog-title" class="form-input" placeholder="e.g. Master CSS Grid & Flexbox in 2026" required>
+              <input type="text" id="blog-title" class="form-input" placeholder="e.g. Master CSS Grid & Flexbox in 2026"
+                required>
             </div>
 
             <!-- Short Description -->
             <div class="form-group">
               <label for="blog-description" class="form-label">Short Summary / Description *</label>
-              <textarea id="blog-description" class="form-input" rows="3" maxlength="200" placeholder="A concise summary of your post that appears on article cards..." required></textarea>
+              <textarea id="blog-description" class="form-input" rows="3" maxlength="200"
+                placeholder="A concise summary of your post that appears on article cards..." required></textarea>
               <div class="char-counter" id="desc-char-count">0 / 200 characters</div>
             </div>
 
             <!-- Blog Content Textarea -->
             <div class="form-group">
               <label for="blog-content" class="form-label">Full Article Content *</label>
-              <textarea id="blog-content" class="form-input" rows="12" placeholder="Write your full blog post content here... Supports standard paragraphs and line breaks." required></textarea>
+              <textarea id="blog-content" class="form-input" rows="12"
+                placeholder="Write your full blog post content here... Supports standard paragraphs and line breaks."
+                required></textarea>
             </div>
           </div>
 
           <!-- Sidebar Form Column -->
           <div class="editor-sidebar">
-            
+
             <!-- Publishing Settings Card -->
             <div class="editor-sidebar-card">
               <h3>Post Settings</h3>
-              
+
               <!-- Category Select -->
               <div class="form-group">
                 <label for="blog-category" class="form-label">Category *</label>
@@ -125,8 +132,10 @@
 
             <!-- Action Buttons Card -->
             <div class="editor-sidebar-card">
-              <button type="submit" class="btn btn-primary btn-block btn-lg" id="publish-blog-btn">🚀 Publish Article</button>
-              <button type="button" class="btn btn-secondary btn-block" style="margin-top: 0.75rem;" onclick="location.href='dashboard.html';">Cancel</button>
+              <button type="submit" class="btn btn-primary btn-block btn-lg" id="publish-blog-btn">🚀 Publish
+                Article</button>
+              <button type="button" class="btn btn-secondary btn-block" style="margin-top: 0.75rem;"
+                onclick="location.href='dashboard.html';">Cancel</button>
             </div>
 
           </div>
@@ -148,4 +157,5 @@
   <!-- Reusable JavaScript -->
   <script src="js/script.js"></script>
 </body>
+
 </html>
