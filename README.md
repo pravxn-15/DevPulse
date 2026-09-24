@@ -1,77 +1,203 @@
-# DevPulse — Full-Stack Blog Application
+# ⚡ DevPulse — Full-Stack Blog & Technical Publishing Platform
 
-## About
-**DevPulse** is a complete, full-stack **Blog Application** built for the **Codomax Digital Solutions** internship assignment. It features a modern, responsive frontend (**HTML5**, **CSS3**, **Vanilla JavaScript**) paired with a robust **Node.js & Express.js REST API** backend backed by **MongoDB** data persistence, **bcryptjs** password security, and **JWT (JSON Web Token)** user authentication with private route protection.
+[![Node.js](https://img.shields.io/badge/Node.js-18.x%20%7C%2020.x-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![Express.js](https://img.shields.io/badge/Express.js-4.x-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose%20ODM-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![JWT](https://img.shields.io/badge/Auth-JWT%20%2B%20Bcrypt-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)](https://jwt.io/)
+[![Frontend](https://img.shields.io/badge/Frontend-Vanilla%20HTML5%20%2F%20CSS3%20%2F%20ES6+-E34F26?style=for-the-badge&logo=html5&logoColor=white)](https://developer.mozilla.org/)
+[![Status](https://img.shields.io/badge/Deployment-Ready-success?style=for-the-badge)](#-deployment-guide)
 
----
-
-## Key Features
-
-### 🔐 Authentication & Protected Dashboard
-- **JWT Token Authentication**: Issues signed JSON Web Tokens (`jsonwebtoken`) upon registration and login.
-- **Protected Private Routes**: Unauthenticated users attempting to access `dashboard.html` or `create-blog.html` are automatically redirected to `login.html`.
-- **User-Scoped Dashboard**: Restricts articles displayed on `dashboard.html` to only those created by the active logged-in author.
-- **Dynamic Profile & Logout**: Navbar dynamically displays user profile information and a **Logout** button when logged in.
-
-### 💻 Frontend Architecture
-- **Custom Aesthetic Palette**: Styled with Deep Forest Teal (`#004741`) and Soft Warm Cream (`#F0EDE4`).
-- **Responsive Architecture**: Mobile-first design covering 320px to 1440px+ viewports with zero horizontal scrolling.
-- **Dedicated Article Detail Page (`blog-detail.html`)**: Dynamic single article view (`blog-detail.html?id=...`) with view counting, cover images, and tags.
-- **Interactive Full CRUD Dashboard**: Real-time stat cards, responsive table/cards, search, status filtering, and blog edit/delete modals.
-
-### ⚡ Backend REST API
-- **Auth Routes**:
-  - `POST /api/auth/register` — Registers new users with `bcryptjs` password hashing and issues JWT.
-  - `POST /api/auth/login` — Verifies hashed credentials and returns JWT token.
-- **Blog Routes**:
-  - `POST /api/blogs` — Creates a new blog post.
-  - `GET /api/blogs` — Retrieves all blogs (supports `?category=...`, `?search=...`, and `?status=...`).
-  - `GET /api/blogs/:id` — Retrieves a single blog by ID and automatically increments view count.
-  - `PUT /api/blogs/:id` — Updates an existing blog article.
-  - `DELETE /api/blogs/:id` — Deletes a blog post from database.
+> **DevPulse** is a modern, high-performance Full-Stack Web Application designed for developers, technical writers, and content creators. Built with a pristine Vanilla HTML5/CSS3/JavaScript frontend and an asynchronous Express & MongoDB REST API, DevPulse delivers a frictionless experience for writing, reading, managing, and discovering technical articles.
 
 ---
 
-## Technologies Used
-- **Frontend**: HTML5, CSS3 (Vanilla), JavaScript (Vanilla ES6+), LocalStorage fallback engine.
-- **Backend**: Node.js, Express.js, CORS, `jsonwebtoken` middleware.
-- **Database**: MongoDB (via Mongoose ODM) with JSON database fallback.
-- **Security**: `bcryptjs` password hashing & JWT token validation.
+## 🌟 Core Features & Capabilities
+
+### 🔐 1. Authentication & Custom Profile Engine
+- **JWT-Secured Sessions**: Issue and verify JSON Web Tokens (`jsonwebtoken`) with `bcryptjs` password encryption.
+- **Gender-Based Default Avatars**: Automatically assigns customized default profile images upon registration (`male.jpg` / `female.jpg` / other).
+- **Interactive Avatar Editor**: Update author profile pictures directly from the Dashboard via:
+  - Presets (👨 Male Avatar / 👩 Female Avatar)
+  - Device File Upload (Instant FileReader Base64 conversion)
+  - Custom Image URL
+- **Dynamic Navbar User Menu**: Live profile chip, personalized welcome badges, and single-click session clearance.
+- **Route Guarding**: Restricts unauthenticated access to author-specific endpoints and dashboards.
+
+### 📝 2. Full-Featured Blog Publishing & CRUD Engine
+- **Create & Publish**: Rich article editor with real-time character counters, featured image previews, tags, and category taxonomies.
+- **Dynamic Clickable Featured Hero**: Automatically showcases the latest published article on the homepage hero banner with direct 1-click navigation.
+- **Real-Time Article Detail View (`blog-detail.html`)**: Dynamic URL routing (`?id=...`), reading time calculation, view counter incrementation, tag badges, and author bios.
+- **Search & Multi-Category Filtering**: Instant client-side & server-side filtering across Technology, Web Development, Programming, Career, Design, and Education.
+
+### 📊 3. Author Dashboard & Analytics
+- **User-Scoped Content Filter**: Authors see and manage strictly their own articles.
+- **Live Metrics**: Overview cards calculating Total Articles, Published Posts, Drafts, and Total Views.
+- **In-Place Article Editor Modal**: Edit titles, categories, descriptions, content, and publishing status without leaving the dashboard.
+- **Safe Deletion Guard**: Modal confirmation safeguarding against accidental article deletion.
+
+### 🎨 4. Design & Mobile Responsiveness
+- **Curated Palette**: Deep Teal (`#004741`), Warm Soft Sand (`#F0EDE4`), and crisp accent highlights.
+- **100% Fluid & Mobile Responsive**: Tailored viewports from 320px smartphones to 4K desktop screens with native CSS Grid, Flexbox, and zero heavy UI dependencies.
+- **Global Toast Alert System**: Animated visual notifications for logins, creations, updates, and validations.
 
 ---
 
-## Pages Included
-1. `index.html` — Homepage (Hero, Search/Filter, Featured Blogs Grid, Category Cards)
-2. `login.html` — Login Page (Form validation, password toggle, JWT issuance)
-3. `register.html` — Registration Page (Bcrypt registration, password confirmation)
-4. `dashboard.html` — Protected Author Dashboard (Stats, User-scoped table, edit modal, delete modal)
-5. `create-blog.html` — Protected Blog Editor (Character counter, cover image preview, publishing)
-6. `blog-detail.html` — Individual Article Detail View (Full article text, author details, view counter)
+## 🏗️ Architecture & Tech Stack
+
+```
+                                    ┌────────────────────────┐
+                                    │    Client Browser      │
+                                    │ (HTML5, CSS3, ES6+ JS) │
+                                    └───────────┬────────────┘
+                                                │
+                               HTTP Requests    │  REST API Calls
+                               (JSON & Assets)  ▼  (JWT Headers)
+                                    ┌────────────────────────┐
+                                    │   Express REST API     │
+                                    │      (Node.js)         │
+                                    └───────────┬────────────┘
+                                                │
+                                    ┌───────────┴────────────┐
+                                    ▼                        ▼
+                        ┌──────────────────────┐  ┌──────────────────────┐
+                        │   MongoDB Database   │  │ JSON DB Engine (Sync)│
+                        │    (Mongoose ODM)    │  │  (Fallback Storage)  │
+                        └──────────────────────┘  └──────────────────────┘
+```
+
+| Layer | Technologies |
+| :--- | :--- |
+| **Frontend** | Vanilla HTML5, CSS3 (Custom Variables, Flexbox, Grid), Modern JavaScript (ES6+ Async/Await, Fetch API) |
+| **Backend** | Node.js, Express.js REST Framework, CORS, Dotenv, JWT Authentication |
+| **Database** | MongoDB (Mongoose Schema Validation) + Resilient JSON File Persistence fallback |
+| **Security** | Bcrypt password salting (10 rounds), JSON Web Tokens (7-day validity), CORS protection |
 
 ---
 
-## How to Run
+## 📡 REST API Reference
 
-### 1. Start the Express Backend Server
+### 🔐 Authentication Endpoints (`/api/auth`)
+| Method | Endpoint | Description | Payload |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/auth/register` | Register a new user with chosen gender & avatar | `{ name, email, password, gender, avatar }` |
+| `POST` | `/api/auth/login` | Authenticate user and receive signed JWT | `{ email, password }` |
+| `PUT` | `/api/auth/profile` | Update user profile, name, or custom avatar | `{ email, name, avatar, gender }` |
+
+### 📝 Blog Endpoints (`/api/blogs`)
+| Method | Endpoint | Description | Query / Body |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/blogs` | Retrieve all blog posts (supports filtering) | `?category=...&search=...&status=...` |
+| `GET` | `/api/blogs/:id` | Get single article details and increment views | URL param `:id` |
+| `POST` | `/api/blogs` | Create a new blog post | `{ title, category, description, content, author, authorAvatar, image, tags, status }` |
+| `PUT` | `/api/blogs/:id` | Update an existing blog post | `{ title, category, description, content, status }` |
+| `DELETE` | `/api/blogs/:id` | Remove a blog post from database | URL param `:id` |
+
+---
+
+## 🚀 Getting Started (Local Setup)
+
+### 1. Prerequisites
+- [Node.js](https://nodejs.org/) (v16.x or higher)
+- [Git](https://git-scm.com/)
+- (Optional) MongoDB local server or MongoDB Atlas connection URI
+
+### 2. Clone Repository
+```bash
+git clone https://github.com/pravxn-15/DevPulse.git
+cd DevPulse
+```
+
+### 3. Install & Start Backend Server
 ```bash
 cd backend
 npm install
 npm start
 ```
-The Express server will start on `http://localhost:5000`.
+The Express REST API server will launch at:
+```
+⚡ DevPulse Express API Server running on port 5000
+🌐 Base API URL: http://localhost:5000/api
+```
 
-### 2. Open the Frontend
-Open `index.html` directly in any web browser or use VS Code **Live Server**.
+### 4. Launch Frontend
+Open `index.html` in your favorite web browser or start a local static server:
+```bash
+# Using VS Code Live Server extension OR Python HTTP server:
+python -m http.server 3000
+```
 
 ---
 
-## Internship Details
+## ☁️ Deployment Guide
 
-- **Internship:** Codomax Digital Solutions  
-- **Module:** Full-Stack Web Development  
+### 🅰️ Deploy on Vercel (Recommended for Full Stack)
+1. Fork or push this repository to your **GitHub** account.
+2. Go to [Vercel.com](https://vercel.com/) and click **"Add New Project"**.
+3. Import the `DevPulse` repository.
+4. The project includes pre-configured `vercel.json` routing. Click **Deploy**.
+5. Your full-stack application will be live with free global CDN!
+
+### 🅱️ Deploy on Render (Backend) + Netlify (Frontend)
+1. **Render Backend**:
+   - Create a new **Web Service** on [Render.com](https://render.com/).
+   - Root Directory: `backend`
+   - Build Command: `npm install`
+   - Start Command: `npm start`
+   - Set environment variables: `PORT=5000`, `JWT_SECRET=your_secret_key`, `MONGO_URI=your_mongodb_uri`.
+2. **Netlify Frontend**:
+   - Create a new site on [Netlify.com](https://www.netlify.com/) linked to your repository.
+   - Publish Directory: `.`
+   - In `js/script.js`, point `API_URL` to your live Render backend URL.
 
 ---
 
-## Repository Link
+## 📂 Project Directory Structure
 
-- **GitHub Repository:** https://github.com/pravxn-15/DevPulse.git
+```
+DevPulse/
+├── backend/
+│   ├── config/
+│   │   └── db.js                 # MongoDB connection & fallback setup
+│   ├── controllers/
+│   │   ├── authController.js     # User registration, login & profile update
+│   │   └── blogController.js     # Full CRUD controllers for articles
+│   ├── data/
+│   │   ├── blogs.json            # JSON Database fallback for articles
+│   │   └── users.json            # JSON Database fallback for users
+│   ├── middleware/
+│   │   └── authMiddleware.js     # JWT route protection middleware
+│   ├── models/
+│   │   ├── Blog.js               # Mongoose Blog schema & validation
+│   │   └── User.js               # Mongoose User schema & validation
+│   ├── routes/
+│   │   ├── authRoutes.js         # /api/auth routes
+│   │   └── blogRoutes.js         # /api/blogs routes
+│   ├── package.json              # Backend dependencies
+│   └── server.js                 # Main Express server entrypoint
+├── css/
+│   └── style.css                 # Master responsive stylesheet
+├── js/
+│   └── script.js                 # Master frontend client script
+├── index.html                    # Homepage & dynamic featured article
+├── blog-detail.html              # Dedicated full article reader
+├── create-blog.html              # Article authoring & publishing editor
+├── dashboard.html                # User-scoped analytics & CRUD dashboard
+├── login.html                    # User sign-in interface
+├── register.html                 # User account creation with gender selection
+├── male.jpg                      # Default male author avatar
+├── female.jpg                    # Default female author avatar
+├── vercel.json                   # Vercel deployment configuration
+├── netlify.toml                  # Netlify deployment configuration
+└── README.md                     # Documentation
+```
+
+---
+
+## 👥 Authors & Acknowledgments
+
+- **Developer:** Praveen Kumar
+- **Repository:** [https://github.com/pravxn-15/DevPulse](https://github.com/pravxn-15/DevPulse)
+- **Organization:** Codomax Digital Solutions Internship Submission
+
+---
+*Developed with ❤️ using Vanilla Web Technologies, Express.js & MongoDB.*
