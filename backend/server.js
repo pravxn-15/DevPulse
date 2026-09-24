@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const { connectDB } = require('./config/db');
+const connectDB = require('./config/db');
 
 const authRoutes = require('./routes/authRoutes');
 const blogRoutes = require('./routes/blogRoutes');
@@ -20,21 +20,27 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Static file serving for images and uploads
+app.use(express.static(path.join(__dirname, '../')));
+
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/blogs', blogRoutes);
 
-// Health Check Route
-app.get('/', (req, res) => {
+// Health Check & Base API Route
+const getApiStatus = (req, res) => {
   res.json({
     status: 'success',
     message: 'DevPulse Node.js Express REST API Server with Database Integration is running smoothly!',
     endpoints: {
-      auth: ['POST /api/auth/register', 'POST /api/auth/login'],
-      blogs: ['GET /api/blogs', 'GET /api/blogs/:id', 'POST /api/blogs', 'DELETE /api/blogs/:id']
+      auth: ['POST /api/auth/register', 'POST /api/auth/login', 'PUT /api/auth/profile'],
+      blogs: ['GET /api/blogs', 'GET /api/blogs/:id', 'POST /api/blogs', 'PUT /api/blogs/:id', 'DELETE /api/blogs/:id']
     }
   });
-});
+};
+
+app.get('/', getApiStatus);
+app.get('/api', getApiStatus);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

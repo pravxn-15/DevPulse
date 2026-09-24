@@ -1,16 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Read full technical article on DevPulse Blog Application.">
-  <title>Article Details — DevPulse</title>
-
+  <meta name="description" content="Read full technical blog post on DevPulse.">
+  <title>Blog Article — DevPulse</title>
+  
   <!-- CSS Stylesheet -->
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    .article-hero {
+      padding: 3rem 0 2rem 0;
+      background: radial-gradient(circle at 50% 0%, rgba(0, 71, 65, 0.08) 0%, transparent 60%);
+    }
+    .article-header {
+      max-width: 800px;
+      margin: 0 auto 2rem auto;
+      text-align: center;
+    }
+    .article-meta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.25rem;
+      margin: 1.5rem 0;
+      flex-wrap: wrap;
+    }
+    .article-author-box {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .article-featured-img {
+      width: 100%;
+      max-height: 480px;
+      object-fit: cover;
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-lg);
+      margin-bottom: 3rem;
+    }
+    .article-body-content {
+      max-width: 780px;
+      margin: 0 auto;
+      font-size: 1.15rem;
+      line-height: 1.85;
+      color: var(--text-main);
+      white-space: pre-line;
+    }
+    .article-tags {
+      max-width: 780px;
+      margin: 2.5rem auto;
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+  </style>
 </head>
-
 <body>
 
   <!-- Navigation Bar -->
@@ -30,7 +75,7 @@
       </nav>
 
       <div class="nav-actions">
-        <a href="index.html" class="btn btn-secondary btn-sm">← Back to Explore</a>
+        <a href="index.html" class="btn btn-secondary btn-sm">← Back to Articles</a>
         <button class="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
           ☰
         </button>
@@ -38,26 +83,16 @@
     </div>
   </header>
 
-  <!-- Article Detail Main Content -->
-  <main style="padding: 3rem 0 5rem 0;">
-    <div class="container" style="max-width: 860px;">
+  <!-- Article View Section -->
+  <main class="article-hero" id="article-main-container">
+    <div class="container">
       
-      <!-- Back Link -->
-      <div style="margin-bottom: 2rem;">
-        <a href="index.html" style="color: var(--primary); text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem;">
-          ← Back to All Articles
-        </a>
-      </div>
-
-      <!-- Article Container Card -->
-      <article id="article-detail-container" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: 2.5rem; box-shadow: var(--shadow-md);">
-        
-        <div style="text-align: center; padding: 3rem 1rem;">
-          <div style="font-size: 2rem; margin-bottom: 1rem;">⏳</div>
-          <p style="color: var(--text-muted);">Loading article details...</p>
+      <div id="article-content-wrapper">
+        <!-- Rendered dynamically by js/script.js -->
+        <div style="text-align: center; padding: 4rem 1rem;">
+          <h2 style="color: var(--text-muted);">Loading article details...</h2>
         </div>
-
-      </article>
+      </div>
 
     </div>
   </main>
@@ -66,13 +101,98 @@
   <footer class="footer">
     <div class="container">
       <div class="footer-bottom">
-        <p>&copy; 2026 DevPulse. Built with Vanilla Web Technologies & Node.js Express REST API.</p>
+        <p>&copy; 2026 DevPulse. Built with Vanilla Web Technologies for Codomax Internship Submission.</p>
       </div>
     </div>
   </footer>
 
   <!-- Reusable JavaScript -->
   <script src="js/script.js"></script>
-</body>
+  <script>
+    // Page specific loader for blog-detail.html
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const blogId = urlParams.get('id') || 'blog_1';
 
+      const container = document.getElementById('article-content-wrapper');
+      if (!container) return;
+
+      try {
+        let blog = null;
+
+        // Try API endpoint (increments views automatically)
+        try {
+          const res = await fetch(`http://localhost:5000/api/blogs/${blogId}`);
+          if (res.ok) {
+            const json = await res.json();
+            if (json.success) blog = json.data;
+          }
+        } catch (e) {}
+
+        // Fallback to local storage if API is offline
+        if (!blog) {
+          const stored = localStorage.getItem('blog_app_posts');
+          if (stored) {
+            const blogs = JSON.parse(stored);
+            blog = blogs.find(b => b.id === blogId || b._id === blogId);
+          }
+        }
+
+        if (!blog) {
+          container.innerHTML = `
+            <div style="text-align: center; padding: 4rem 1rem;">
+              <h2>Article Not Found</h2>
+              <p style="color: var(--text-muted); margin-top: 0.5rem;">The article you are looking for does not exist or has been removed.</p>
+              <a href="index.html" class="btn btn-primary" style="margin-top: 1.5rem;">Return to Homepage</a>
+            </div>
+          `;
+          return;
+        }
+
+        document.title = `${blog.title} — DevPulse`;
+
+        const tagsHtml = (blog.tags || []).map(t => `<span class="category-pill">${t}</span>`).join('');
+
+        container.innerHTML = `
+          <div class="article-header">
+            <span class="hero-card-tag">${blog.category}</span>
+            <h1 style="font-size: 2.75rem; margin: 1rem 0; line-height: 1.2;">${blog.title}</h1>
+            <p style="font-size: 1.2rem; color: var(--text-muted); line-height: 1.6;">${blog.description}</p>
+            
+            <div class="article-meta">
+              <div class="article-author-box">
+                <img src="${blog.authorAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80'}" alt="${blog.author}" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover;">
+                <div style="text-align: left;">
+                  <strong style="display: block; font-size: 0.95rem;">${blog.author || 'Alex Morgan'}</strong>
+                  <span style="font-size: 0.8rem; color: var(--text-muted);">${blog.date} • ${blog.readTime || '5 min read'}</span>
+                </div>
+              </div>
+              <span style="background: var(--bg-surface); padding: 0.4rem 0.85rem; border-radius: var(--radius-full); border: 1px solid var(--border-color); font-size: 0.85rem; font-weight: 600;">
+                👁️ ${blog.views || 1} views
+              </span>
+            </div>
+          </div>
+
+          <img src="${blog.image}" alt="${blog.title}" class="article-featured-img">
+
+          <div class="article-body-content">
+            ${blog.content}
+          </div>
+
+          <div class="article-tags">
+            <strong style="margin-right: 0.5rem; align-self: center;">Tags:</strong>
+            ${tagsHtml || '<span style="color:var(--text-muted)">General</span>'}
+          </div>
+
+          <div style="max-width: 780px; margin: 3rem auto; padding-top: 2rem; border-top: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;">
+            <a href="index.html" class="btn btn-secondary">← Back to Articles</a>
+            <button class="btn btn-outline" onclick="navigator.clipboard.writeText(window.location.href); alert('Article URL copied to clipboard!');">🔗 Share Article</button>
+          </div>
+        `;
+      } catch (err) {
+        container.innerHTML = `<p style="text-align:center; color:var(--danger)">Error loading article details.</p>`;
+      }
+    });
+  </script>
+</body>
 </html>

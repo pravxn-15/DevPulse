@@ -1,23 +1,17 @@
 const mongoose = require('mongoose');
 
-let isConnected = false;
-
 const connectDB = async () => {
-  const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/devpulse';
+  const connUri = process.env.MONGO_URI || 'mongodb://localhost:27017/devpulse_blog';
+
   try {
-    const conn = await mongoose.connect(uri, {
-      serverSelectionTimeoutMS: 3000 // Quick timeout if MongoDB is offline
+    const conn = await mongoose.connect(connUri, {
+      serverSelectionTimeoutMS: 3000
     });
-    isConnected = true;
-    console.log(`🍃 MongoDB Connected: ${conn.connection.host}`);
-    return conn;
+    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
   } catch (err) {
-    isConnected = false;
-    console.warn(`⚠️ MongoDB connection attempt failed: ${err.message}`);
-    console.warn(`ℹ️ Operating with hybrid database fallback mode.`);
+    console.log(`⚠️ MongoDB Connection Info: Running in Local Fallback Mode (${err.message})`);
   }
 };
 
-const getIsConnected = () => isConnected;
-
-module.exports = { connectDB, getIsConnected };
+module.exports = connectDB;
+module.exports.connectDB = connectDB;

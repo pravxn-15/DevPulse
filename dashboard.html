@@ -43,10 +43,18 @@
       <!-- Welcome Profile Banner -->
       <div class="dashboard-welcome">
         <div class="user-profile-summary">
-          <img src="praveen photo.jpeg" alt="Alex Morgan" class="user-avatar-large">
+          <div class="user-avatar-wrapper" id="change-avatar-trigger" title="Click to Change Profile Picture">
+            <img src="male.jpg" alt="Author Avatar" class="user-avatar-large" id="dashboard-user-avatar">
+            <span class="avatar-edit-badge">📷</span>
+          </div>
           <div class="user-info">
-            <h1>Welcome back, Alex Morgan 👋</h1>
-            <p>Author & Senior Frontend Engineer • <strong>Codomax Internship Platform</strong></p>
+            <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+              <h1 id="dashboard-user-name">Welcome back, Author 👋</h1>
+              <button class="btn btn-outline btn-sm" id="btn-change-avatar" style="font-size: 0.75rem; padding: 0.25rem 0.6rem;">
+                ✏️ Change Photo
+              </button>
+            </div>
+            <p id="dashboard-user-role">Author & Technical Writer • <span id="dashboard-user-email">author@devpulse.com</span></p>
           </div>
         </div>
         <div>

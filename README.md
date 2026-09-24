@@ -1,74 +1,77 @@
-# Blog Application
+# DevPulse — Full-Stack Blog Application
 
 ## About
-This is a complete, polished, responsive **Blog Application frontend** created as part of the **Codomax Digital Solutions** internship assignment. The project is designed with a modern SaaS / blog aesthetic using pure web standards (**HTML5**, **CSS3**, and **Vanilla JavaScript**), without relying on any external frontend frameworks or libraries.
+**DevPulse** is a complete, full-stack **Blog Application** built for the **Codomax Digital Solutions** internship assignment. It features a modern, responsive frontend (**HTML5**, **CSS3**, **Vanilla JavaScript**) paired with a robust **Node.js & Express.js REST API** backend backed by **MongoDB** data persistence, **bcryptjs** password security, and **JWT (JSON Web Token)** user authentication with private route protection.
 
 ---
 
-## Features
-- **Responsive Modern Design**: Mobile-first architecture supporting desktop, tablet, and mobile screens (320px to 1440px+).
-- **Blog Browsing & Modal Reader**: Explore featured articles, filter by categories, perform real-time search, and read full articles in interactive modal dialogs.
-- **Login & Registration UI**: Clean auth forms with real-time field validation, password show/hide toggle, matching password confirmation, and friendly error feedback.
-- **Author Analytics Dashboard**: Interactive user dashboard featuring real-time stat cards (Total Blogs, Published, Drafts, Views), search & status filtering, responsive desktop table to mobile card conversion, and blog deletion modals.
-- **Blog Creation & LocalStorage Persistence**: Feature-packed editor with live character counter, image preview, draft auto-save, live post preview, and `localStorage` state management.
-- **Toast Notification Engine**: Custom floating toast feedback system for form submissions, draft saves, and actions.
-- **Mobile Navigation Drawer**: Accessible, smooth slide-out menu drawer for mobile viewports.
+## Key Features
+
+### 🔐 Authentication & Protected Dashboard
+- **JWT Token Authentication**: Issues signed JSON Web Tokens (`jsonwebtoken`) upon registration and login.
+- **Protected Private Routes**: Unauthenticated users attempting to access `dashboard.html` or `create-blog.html` are automatically redirected to `login.html`.
+- **User-Scoped Dashboard**: Restricts articles displayed on `dashboard.html` to only those created by the active logged-in author.
+- **Dynamic Profile & Logout**: Navbar dynamically displays user profile information and a **Logout** button when logged in.
+
+### 💻 Frontend Architecture
+- **Custom Aesthetic Palette**: Styled with Deep Forest Teal (`#004741`) and Soft Warm Cream (`#F0EDE4`).
+- **Responsive Architecture**: Mobile-first design covering 320px to 1440px+ viewports with zero horizontal scrolling.
+- **Dedicated Article Detail Page (`blog-detail.html`)**: Dynamic single article view (`blog-detail.html?id=...`) with view counting, cover images, and tags.
+- **Interactive Full CRUD Dashboard**: Real-time stat cards, responsive table/cards, search, status filtering, and blog edit/delete modals.
+
+### ⚡ Backend REST API
+- **Auth Routes**:
+  - `POST /api/auth/register` — Registers new users with `bcryptjs` password hashing and issues JWT.
+  - `POST /api/auth/login` — Verifies hashed credentials and returns JWT token.
+- **Blog Routes**:
+  - `POST /api/blogs` — Creates a new blog post.
+  - `GET /api/blogs` — Retrieves all blogs (supports `?category=...`, `?search=...`, and `?status=...`).
+  - `GET /api/blogs/:id` — Retrieves a single blog by ID and automatically increments view count.
+  - `PUT /api/blogs/:id` — Updates an existing blog article.
+  - `DELETE /api/blogs/:id` — Deletes a blog post from database.
 
 ---
 
-## Technologies
-- **HTML5**: Semantic document structure, form inputs, ARIA accessibility attributes.
-- **CSS3**: Custom CSS variables, Grid & Flexbox layouts, smooth hover animations, dark emerald `#004741` & warm cream `#F0EDE4` palette.
-- **JavaScript (Vanilla ES6+)**: DOM manipulation, event handlers, client-side form validation, `localStorage` CRUD operations.
+## Technologies Used
+- **Frontend**: HTML5, CSS3 (Vanilla), JavaScript (Vanilla ES6+), LocalStorage fallback engine.
+- **Backend**: Node.js, Express.js, CORS, `jsonwebtoken` middleware.
+- **Database**: MongoDB (via Mongoose ODM) with JSON database fallback.
+- **Security**: `bcryptjs` password hashing & JWT token validation.
 
 ---
 
-## Pages
-1. `index.html` — Home (Hero section, Search & Category Filters, Featured Blogs, Category Cards, Footer)
-2. `login.html` — Login (Form validation, password toggle, authentication UI)
-3. `register.html` — Register (Account creation form, confirm password check, terms validation)
-4. `dashboard.html` — Dashboard (User profile, analytics stat cards, filterable blog table/cards, delete post modal)
-5. `create-blog.html` — Create Blog (Rich form editor, character counter, image URL preview, draft saving, live article preview)
-
----
-
-## Project Structure
-
-```text
-blog-application/
-├── index.html
-├── login.html
-├── register.html
-├── dashboard.html
-├── create-blog.html
-├── css/
-│   └── style.css
-├── js/
-│   └── script.js
-└── README.md
-```
+## Pages Included
+1. `index.html` — Homepage (Hero, Search/Filter, Featured Blogs Grid, Category Cards)
+2. `login.html` — Login Page (Form validation, password toggle, JWT issuance)
+3. `register.html` — Registration Page (Bcrypt registration, password confirmation)
+4. `dashboard.html` — Protected Author Dashboard (Stats, User-scoped table, edit modal, delete modal)
+5. `create-blog.html` — Protected Blog Editor (Character counter, cover image preview, publishing)
+6. `blog-detail.html` — Individual Article Detail View (Full article text, author details, view counter)
 
 ---
 
 ## How to Run
 
-1. **Download or clone the repository** to your local machine.
-2. **Open the project folder** in your file explorer or code editor.
-3. **Open `index.html`** directly in any modern web browser (Google Chrome, Mozilla Firefox, Microsoft Edge, or Safari).
+### 1. Start the Express Backend Server
+```bash
+cd backend
+npm install
+npm start
+```
+The Express server will start on `http://localhost:5000`.
 
-> **Tip**: You can also use **VS Code** with the **Live Server** extension by right-clicking `index.html` and selecting *"Open with Live Server"*.
+### 2. Open the Frontend
+Open `index.html` directly in any web browser or use VS Code **Live Server**.
 
 ---
 
 ## Internship Details
 
 - **Internship:** Codomax Digital Solutions  
-- **Module:** Module 1 — Frontend Development  
-- **Duration:** Day 1 – Day 4  
+- **Module:** Full-Stack Web Development  
 
 ---
 
-## Repository & Social Links
+## Repository Link
 
-- **GitHub Repository:** `[Add your repository link]`
-- **LinkedIn Post:** `[Add your LinkedIn post link]`
+- **GitHub Repository:** https://github.com/pravxn-15/DevPulse.git

@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const BlogSchema = new mongoose.Schema({
   title: {
     type: String,
-    required: [true, 'Please provide a blog title'],
+    required: [true, 'Please enter a blog title'],
     trim: true
   },
   category: {
@@ -15,11 +15,11 @@ const BlogSchema = new mongoose.Schema({
   description: {
     type: String,
     required: [true, 'Please provide a short description'],
-    maxlength: [200, 'Description cannot exceed 200 characters']
+    maxlength: [250, 'Description cannot exceed 250 characters']
   },
   content: {
     type: String,
-    required: [true, 'Please write full article content']
+    required: [true, 'Please enter the blog content']
   },
   author: {
     type: String,
@@ -27,7 +27,7 @@ const BlogSchema = new mongoose.Schema({
   },
   authorAvatar: {
     type: String,
-    default: 'praveen photo.jpeg'
+    default: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80'
   },
   date: {
     type: String,
@@ -39,7 +39,7 @@ const BlogSchema = new mongoose.Schema({
   },
   image: {
     type: String,
-    default: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=800&q=80'
+    default: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=800&q=80'
   },
   status: {
     type: String,
@@ -50,14 +50,11 @@ const BlogSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  tags: {
-    type: [String],
-    default: []
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  }
+  tags: [{
+    type: String
+  }]
+}, {
+  timestamps: true
 });
 
 module.exports = mongoose.model('Blog', BlogSchema);

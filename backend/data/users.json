@@ -4,6 +4,8 @@
     "name": "Alex Morgan",
     "email": "alex.morgan@example.com",
     "password": "password123",
+    "gender": "Male",
+    "avatar": "male.jpg",
     "createdAt": "2026-09-01T10:00:00.000Z"
   },
   {
@@ -11,6 +13,8 @@
     "name": "Praveen",
     "email": "praveen@example.com",
     "password": "password123",
+    "gender": "Male",
+    "avatar": "male.jpg",
     "createdAt": "2026-09-17T13:39:52.997Z"
   },
   {
@@ -18,6 +22,8 @@
     "name": "praveen",
     "email": "praveen9345561356@gmail.com",
     "password": "Praveen@11",
+    "gender": "Male",
+    "avatar": "male.jpg",
     "createdAt": "2026-09-17T13:42:33.279Z"
   }
 ]

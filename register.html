@@ -63,6 +63,29 @@
           <span class="form-error" id="email-error">Please enter a valid email address.</span>
         </div>
 
+        <!-- Gender Selection with Avatar Preview -->
+        <div class="form-group">
+          <label class="form-label">Select Gender (Default Profile Picture)</label>
+          <div class="gender-selection-grid">
+            <label class="gender-card active" id="gender-male-card">
+              <input type="radio" name="gender" value="Male" id="gender-male" checked>
+              <img src="male.jpg" alt="Male Profile" class="gender-avatar-img">
+              <span class="gender-title">Male</span>
+            </label>
+            <label class="gender-card" id="gender-female-card">
+              <input type="radio" name="gender" value="Female" id="gender-female">
+              <img src="female.jpg" alt="Female Profile" class="gender-avatar-img">
+              <span class="gender-title">Female</span>
+            </label>
+            <label class="gender-card" id="gender-other-card">
+              <input type="radio" name="gender" value="Other" id="gender-other">
+              <div class="gender-avatar-placeholder">👤</div>
+              <span class="gender-title">Other</span>
+            </label>
+          </div>
+          <span class="form-error" id="gender-error">Please select your gender.</span>
+        </div>
+
         <!-- Password Input -->
         <div class="form-group">
           <label for="password" class="form-label">Password</label>

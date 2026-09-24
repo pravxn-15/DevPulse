@@ -1,12 +1,13 @@
 /**
- * Blog Application - Main JavaScript File with Backend REST API Integration
- * Designed for Codomax Digital Solutions Internship Assignment
- * Uses Pure Vanilla JavaScript (ES6+) & Express REST API Integration
+ * Blog Application - Master JavaScript File
+ * Complete REST API Integration with Full CRUD, JWT Auth, Route Protection & Profile Management:
+ * - Route Guards: Protects dashboard.html & create-blog.html
+ * - User-scoped Dashboard: Filters blogs created by the logged-in user
+ * - Profile & Logout: Dynamic navbar user menu & session clear
  */
 
 const API_URL = 'http://localhost:5000/api';
 
-// Initial fallback blog data
 const INITIAL_BLOGS = [
   {
     id: "blog_1",
@@ -15,6 +16,7 @@ const INITIAL_BLOGS = [
     description: "A comprehensive guide to creating fluid, responsive, and accessible web layouts without relying on bulky CSS frameworks.",
     content: "Building web layouts used to be a frustrating experience with CSS floats and clearfix hacks. Modern CSS has evolved tremendously.\n\nFlexbox is perfect for one-dimensional layouts, like navigation bars, button groups, and aligned card items. CSS Grid excels at complex two-dimensional layouts like main page structures and card grids.",
     author: "Alex Morgan",
+    authorEmail: "alex.morgan@example.com",
     authorAvatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80",
     date: "Sep 10, 2026",
     readTime: "5 min read",
@@ -30,6 +32,7 @@ const INITIAL_BLOGS = [
     description: "Essential advice on crafting your resume, building portfolio projects, and acing frontend coding interviews.",
     content: "Landing your first software engineering internship is a significant milestone. Build real projects, practice clean code, master Git & GitHub, and practice core CS fundamentals.",
     author: "Sarah Jenkins",
+    authorEmail: "sarah@example.com",
     authorAvatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80",
     date: "Sep 08, 2026",
     readTime: "7 min read",
@@ -45,6 +48,7 @@ const INITIAL_BLOGS = [
     description: "Exploring artificial intelligence tools, WebAssembly performance gains, and new browser standards reshaping the web.",
     content: "Web development is advancing faster than ever with AI tools, WebAssembly, and browser enhancements.",
     author: "David Chen",
+    authorEmail: "david@example.com",
     authorAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80",
     date: "Sep 05, 2026",
     readTime: "6 min read",
@@ -54,6 +58,31 @@ const INITIAL_BLOGS = [
     tags: ["Tech", "Future", "AI"]
   }
 ];
+
+// Helper to get active logged-in user
+function getLoggedInUser() {
+  const userStr = localStorage.getItem('blog_user');
+  if (!userStr) return null;
+  try {
+    return JSON.parse(userStr);
+  } catch (e) {
+    return null;
+  }
+}
+
+// Route Protection Guard
+function checkRouteProtection() {
+  const currentPath = window.location.pathname.split('/').pop();
+  const protectedPages = ['dashboard.html', 'create-blog.html'];
+
+  if (protectedPages.includes(currentPath)) {
+    const user = getLoggedInUser();
+    if (!user) {
+      alert('Access Restricted: Please sign in to view your dashboard or create a blog.');
+      window.location.href = 'login.html';
+    }
+  }
+}
 
 // Async helper to fetch blogs from Express API or fallback to LocalStorage
 async function fetchBlogsFromApi() {
@@ -70,7 +99,6 @@ async function fetchBlogsFromApi() {
     console.log('Backend API offline, using LocalStorage fallback.');
   }
 
-  // Fallback to LocalStorage
   const data = localStorage.getItem('blog_app_posts');
   if (!data) {
     localStorage.setItem('blog_app_posts', JSON.stringify(INITIAL_BLOGS));
@@ -127,7 +155,7 @@ function showToast(message, type = 'info', duration = 3500) {
   }, duration);
 }
 
-// Navigation Bar
+// Dynamic Navigation Bar & User Profile Logout Handler
 function initNavigation() {
   const toggleBtn = document.querySelector('.nav-toggle');
   const navMenu = document.querySelector('.nav-menu');
@@ -162,9 +190,36 @@ function initNavigation() {
       link.classList.remove('active');
     }
   });
+
+  // Dynamic Profile / Logout in Navbar Actions
+  const user = getLoggedInUser();
+  const navActions = document.querySelector('.nav-actions');
+
+  if (navActions && user) {
+    const userAvatar = user.avatar || (user.gender === 'Female' ? 'female.jpg' : 'male.jpg');
+    navActions.innerHTML = `
+      <span class="nav-user-chip">
+        <img src="${userAvatar}" alt="${user.name}" class="nav-avatar-img">
+        <span>${user.name}</span>
+      </span>
+      <a href="create-blog.html" class="btn btn-primary btn-sm">+ Write Post</a>
+      <button class="btn btn-outline btn-sm" id="nav-logout-btn">Logout</button>
+      <button class="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false">☰</button>
+    `;
+
+    const logoutBtn = document.getElementById('nav-logout-btn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('blog_user');
+        localStorage.removeItem('blog_token');
+        showToast('Logged out successfully', 'info');
+        setTimeout(() => window.location.href = 'login.html', 1000);
+      });
+    }
+  }
 }
 
-// Home Page Logic
+// Home Page Logic (index.html)
 async function initHomePage() {
   const blogContainer = document.getElementById('blog-cards-grid');
   if (!blogContainer) return;
@@ -172,6 +227,32 @@ async function initHomePage() {
   const blogs = (await fetchBlogsFromApi()).filter(b => b.status === 'Published');
   let activeCategory = 'All';
   let searchQuery = '';
+
+  // Dynamically populate Hero Featured Post from real published articles
+  if (blogs.length > 0) {
+    const featuredBlog = blogs[0];
+    const featuredId = featuredBlog._id || featuredBlog.id;
+    const featuredLink = document.getElementById('hero-featured-link');
+    const categoryElem = document.getElementById('hero-card-category');
+    const readTimeElem = document.getElementById('hero-card-readtime');
+    const titleElem = document.getElementById('hero-card-title');
+    const descElem = document.getElementById('hero-card-description');
+    const authorElem = document.getElementById('hero-card-author');
+    const dateElem = document.getElementById('hero-card-date');
+    const avatarElem = document.getElementById('hero-card-avatar');
+
+    if (featuredLink) featuredLink.href = `blog-detail.html?id=${featuredId}`;
+    if (categoryElem) categoryElem.textContent = featuredBlog.category || 'Featured Post';
+    if (readTimeElem) readTimeElem.textContent = featuredBlog.readTime || '5 min read';
+    if (titleElem) titleElem.textContent = featuredBlog.title;
+    if (descElem) descElem.textContent = featuredBlog.description;
+    if (authorElem) authorElem.textContent = featuredBlog.author || 'DevPulse Author';
+    if (dateElem) dateElem.textContent = featuredBlog.date || 'Published Article';
+    if (avatarElem) {
+      avatarElem.src = featuredBlog.authorAvatar || 'male.jpg';
+      avatarElem.alt = featuredBlog.author || 'Author';
+    }
+  }
 
   function renderBlogs() {
     blogContainer.innerHTML = '';
@@ -194,6 +275,7 @@ async function initHomePage() {
     }
 
     filtered.forEach(blog => {
+      const blogId = blog._id || blog.id;
       const card = document.createElement('article');
       card.className = 'blog-card';
       card.innerHTML = `
@@ -203,30 +285,22 @@ async function initHomePage() {
         </div>
         <div class="blog-card-body">
           <h3 class="blog-card-title">
-            <a href="#" data-blog-id="${blog.id}" class="read-blog-btn">${blog.title}</a>
+            <a href="blog-detail.html?id=${blogId}">${blog.title}</a>
           </h3>
           <p class="blog-card-excerpt">${blog.description}</p>
           <div class="blog-card-footer">
             <div class="blog-author">
-              <img src="${blog.authorAvatar}" alt="${blog.author}" class="blog-author-img">
+              <img src="${blog.authorAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80'}" alt="${blog.author}" class="blog-author-img">
               <div>
-                <span class="blog-author-name">${blog.author}</span>
+                <span class="blog-author-name">${blog.author || 'Alex Morgan'}</span>
                 <div style="font-size: 0.75rem; color: var(--text-light);">${blog.date}</div>
               </div>
             </div>
-            <button class="btn btn-outline btn-sm read-blog-btn" data-blog-id="${blog.id}">Read Post</button>
+            <a href="blog-detail.html?id=${blogId}" class="btn btn-outline btn-sm">Read Post</a>
           </div>
         </div>
       `;
       blogContainer.appendChild(card);
-    });
-
-    document.querySelectorAll('.read-blog-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const id = btn.getAttribute('data-blog-id');
-        openBlogModal(id);
-      });
     });
   }
 
@@ -251,63 +325,7 @@ async function initHomePage() {
   renderBlogs();
 }
 
-// Blog Reader Modal
-function openBlogModal(blogId) {
-  const blogs = getStoredBlogsSync();
-  const blog = blogs.find(b => b.id === blogId);
-  if (!blog) return;
-
-  let modalBackdrop = document.getElementById('blog-modal');
-  if (!modalBackdrop) {
-    modalBackdrop = document.createElement('div');
-    modalBackdrop.id = 'blog-modal';
-    modalBackdrop.className = 'modal-backdrop';
-    document.body.appendChild(modalBackdrop);
-  }
-
-  modalBackdrop.innerHTML = `
-    <div class="modal-box modal-lg">
-      <div class="modal-header">
-        <span class="hero-card-tag">${blog.category}</span>
-        <button class="modal-close-btn">&times;</button>
-      </div>
-      <div class="modal-body">
-        <h2 style="font-size: 1.8rem; margin-bottom: 1rem;">${blog.title}</h2>
-        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; color: var(--text-muted); font-size: 0.85rem;">
-          <img src="${blog.authorAvatar}" style="width: 38px; height: 38px; border-radius: 50%; object-fit: cover;">
-          <div>
-            <strong style="color: var(--text-main); display: block;">${blog.author}</strong>
-            <span>${blog.date} • ${blog.readTime || '5 min read'}</span>
-          </div>
-        </div>
-        <img src="${blog.image}" alt="${blog.title}" style="width: 100%; max-height: 350px; object-fit: cover; border-radius: var(--radius-md); margin-bottom: 1.5rem;">
-        <div style="white-space: pre-line; line-height: 1.8; color: var(--text-main); font-size: 1.05rem;">
-          ${blog.content}
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary modal-close-btn">Close Article</button>
-      </div>
-    </div>
-  `;
-
-  modalBackdrop.classList.add('active');
-
-  const closeBtns = modalBackdrop.querySelectorAll('.modal-close-btn');
-  closeBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      modalBackdrop.classList.remove('active');
-    });
-  });
-
-  modalBackdrop.addEventListener('click', (e) => {
-    if (e.target === modalBackdrop) {
-      modalBackdrop.classList.remove('active');
-    }
-  });
-}
-
-// Login Page Logic with Backend Integration
+// Login Page Logic with JWT Token Storage
 function initLoginPage() {
   const loginForm = document.getElementById('login-form');
   if (!loginForm) return;
@@ -351,7 +369,6 @@ function initLoginPage() {
 
     if (!isValid) return;
 
-    // Try Express Backend API
     try {
       const res = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
@@ -360,7 +377,8 @@ function initLoginPage() {
       });
       const data = await res.json();
       if (res.ok && data.success) {
-        showToast('Login successful! Redirecting to dashboard...', 'success');
+        showToast('Login successful! Redirecting...', 'success');
+        localStorage.setItem('blog_token', data.token);
         localStorage.setItem('blog_user', JSON.stringify(data.user));
         setTimeout(() => window.location.href = 'dashboard.html', 1200);
         return;
@@ -369,18 +387,29 @@ function initLoginPage() {
         return;
       }
     } catch (err) {
-      // Backend offline fallback
       showToast('Login successful (Offline mode)! Redirecting...', 'success');
+      localStorage.setItem('blog_token', 'mock_offline_jwt_token');
       localStorage.setItem('blog_user', JSON.stringify({ name: 'Alex Morgan', email }));
       setTimeout(() => window.location.href = 'dashboard.html', 1200);
     }
   });
 }
 
-// Registration Page Logic with Backend Integration
+// Registration Page Logic with Gender Selection & JWT Token Storage
 function initRegisterPage() {
   const registerForm = document.getElementById('register-form');
   if (!registerForm) return;
+
+  // Gender selection card click handlers
+  const genderCards = document.querySelectorAll('.gender-card');
+  genderCards.forEach(card => {
+    card.addEventListener('click', () => {
+      genderCards.forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      const radio = card.querySelector('input[type="radio"]');
+      if (radio) radio.checked = true;
+    });
+  });
 
   registerForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -390,6 +419,9 @@ function initRegisterPage() {
     const password = document.getElementById('password').value.trim();
     const confirmPassword = document.getElementById('confirm-password').value.trim();
     const terms = document.getElementById('terms').checked;
+    const selectedGenderRadio = document.querySelector('input[name="gender"]:checked');
+    const gender = selectedGenderRadio ? selectedGenderRadio.value : 'Male';
+    const defaultAvatar = gender === 'Female' ? 'female.jpg' : 'male.jpg';
 
     const nameErr = document.getElementById('name-error');
     const emailErr = document.getElementById('email-error');
@@ -445,29 +477,215 @@ function initRegisterPage() {
       const res = await fetch(`${API_URL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: fullName, email, password })
+        body: JSON.stringify({ 
+          name: fullName, 
+          email, 
+          password, 
+          gender, 
+          avatar: defaultAvatar 
+        })
       });
       const data = await res.json();
       if (res.ok && data.success) {
         showToast('Registration successful! Redirecting to login...', 'success');
+        if (data.token) localStorage.setItem('blog_token', data.token);
+        if (data.user) localStorage.setItem('blog_user', JSON.stringify(data.user));
         setTimeout(() => window.location.href = 'login.html', 1200);
       } else {
         showToast(data.message || 'Registration failed', 'error');
       }
     } catch (err) {
+      localStorage.setItem('blog_user', JSON.stringify({ 
+        name: fullName, 
+        email, 
+        gender, 
+        avatar: defaultAvatar 
+      }));
       showToast('Registration successful! Redirecting to login...', 'success');
       setTimeout(() => window.location.href = 'login.html', 1200);
     }
   });
 }
 
-// Dashboard Logic with Backend Integration
+// User-Scoped Dashboard Logic & Profile Management
 async function initDashboardPage() {
   const tableBody = document.getElementById('dashboard-table-body');
   const mobileCardsContainer = document.getElementById('dashboard-mobile-cards');
   if (!tableBody && !mobileCardsContainer) return;
 
-  let blogs = await fetchBlogsFromApi();
+  let currentUser = getLoggedInUser();
+
+  // Helper to refresh Dashboard User Header UI
+  const updateDashboardProfileUI = (user) => {
+    if (!user) return;
+    const welcomeElem = document.getElementById('dashboard-user-name');
+    const emailElem = document.getElementById('dashboard-user-email');
+    const avatarElem = document.getElementById('dashboard-user-avatar');
+    
+    if (welcomeElem) welcomeElem.textContent = `Welcome back, ${user.name} 👋`;
+    if (emailElem) emailElem.textContent = user.email || 'author@devpulse.com';
+    const avatarSrc = user.avatar || (user.gender === 'Female' ? 'female.jpg' : 'male.jpg');
+    if (avatarElem) avatarElem.src = avatarSrc;
+  };
+
+  if (currentUser) {
+    updateDashboardProfileUI(currentUser);
+  }
+
+  // Profile Picture Change Modal Implementation
+  function openChangeAvatarModal() {
+    let modal = document.getElementById('change-avatar-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'change-avatar-modal';
+      modal.className = 'modal-backdrop';
+      document.body.appendChild(modal);
+    }
+
+    const user = getLoggedInUser() || { name: 'Author', gender: 'Male', avatar: 'male.jpg' };
+    let selectedAvatar = user.avatar || (user.gender === 'Female' ? 'female.jpg' : 'male.jpg');
+
+    modal.innerHTML = `
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3>Change Profile Picture</h3>
+          <button class="modal-close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-avatar-preview-wrap">
+            <img src="${selectedAvatar}" alt="Selected Avatar Preview" id="avatar-modal-preview" class="modal-avatar-preview">
+            <span style="font-size: 0.85rem; color: var(--text-muted);">Current Preview</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Choose from Gender Preset Avatars:</label>
+            <div class="avatar-preset-grid">
+              <div class="avatar-preset-card ${selectedAvatar === 'male.jpg' ? 'active' : ''}" data-avatar="male.jpg">
+                <img src="male.jpg" alt="Male Avatar" class="avatar-preset-img">
+                <span style="font-size: 0.8rem; font-weight: 600;">👨 Male</span>
+              </div>
+              <div class="avatar-preset-card ${selectedAvatar === 'female.jpg' ? 'active' : ''}" data-avatar="female.jpg">
+                <img src="female.jpg" alt="Female Avatar" class="avatar-preset-img">
+                <span style="font-size: 0.8rem; font-weight: 600;">👩 Female</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top: 1.25rem;">
+            <label class="form-label">Or Upload Your Own Photo (from device):</label>
+            <input type="file" id="avatar-file-input" class="form-input" accept="image/*">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Or Enter Custom Image URL:</label>
+            <input type="url" id="avatar-url-input" class="form-input" placeholder="https://example.com/my-photo.jpg">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary cancel-avatar-modal">Cancel</button>
+          <button class="btn btn-primary" id="save-avatar-btn">Save Profile Picture</button>
+        </div>
+      </div>
+    `;
+
+    modal.classList.add('active');
+    const closeModal = () => modal.classList.remove('active');
+
+    modal.querySelectorAll('.modal-close-btn, .cancel-avatar-modal').forEach(b => b.addEventListener('click', closeModal));
+
+    const previewImg = modal.querySelector('#avatar-modal-preview');
+    const presetCards = modal.querySelectorAll('.avatar-preset-card');
+    const fileInput = modal.querySelector('#avatar-file-input');
+    const urlInput = modal.querySelector('#avatar-url-input');
+
+    presetCards.forEach(card => {
+      card.addEventListener('click', () => {
+        presetCards.forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        selectedAvatar = card.getAttribute('data-avatar');
+        previewImg.src = selectedAvatar;
+        if (urlInput) urlInput.value = '';
+      });
+    });
+
+    if (fileInput) {
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (uploadEvent) => {
+            selectedAvatar = uploadEvent.target.result;
+            previewImg.src = selectedAvatar;
+            presetCards.forEach(c => c.classList.remove('active'));
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+
+    if (urlInput) {
+      urlInput.addEventListener('input', () => {
+        const val = urlInput.value.trim();
+        if (val) {
+          selectedAvatar = val;
+          previewImg.src = selectedAvatar;
+          presetCards.forEach(c => c.classList.remove('active'));
+        }
+      });
+    }
+
+    const saveBtn = modal.querySelector('#save-avatar-btn');
+    if (saveBtn) {
+      saveBtn.addEventListener('click', async () => {
+        const token = localStorage.getItem('blog_token');
+        const activeUser = getLoggedInUser() || user;
+        const updatedUser = { ...activeUser, avatar: selectedAvatar };
+
+        try {
+          const res = await fetch(`${API_URL}/auth/profile`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': token ? `Bearer ${token}` : ''
+            },
+            body: JSON.stringify({ email: activeUser.email, avatar: selectedAvatar })
+          });
+          const data = await res.json();
+          if (res.ok && data.success) {
+            localStorage.setItem('blog_user', JSON.stringify(data.user));
+            if (data.token) localStorage.setItem('blog_token', data.token);
+          } else {
+            localStorage.setItem('blog_user', JSON.stringify(updatedUser));
+          }
+        } catch (err) {
+          localStorage.setItem('blog_user', JSON.stringify(updatedUser));
+        }
+
+        updateDashboardProfileUI(getLoggedInUser());
+        initNavigation();
+        showToast('Profile picture updated successfully!', 'success');
+        closeModal();
+      });
+    }
+  }
+
+  // Bind change avatar triggers
+  const changeAvatarTrigger = document.getElementById('change-avatar-trigger');
+  const btnChangeAvatar = document.getElementById('btn-change-avatar');
+  if (changeAvatarTrigger) changeAvatarTrigger.addEventListener('click', openChangeAvatarModal);
+  if (btnChangeAvatar) btnChangeAvatar.addEventListener('click', openChangeAvatarModal);
+
+  let allBlogs = await fetchBlogsFromApi();
+  // Filter blogs created by or associated with logged-in user
+  let blogs = allBlogs;
+  if (currentUser) {
+    blogs = allBlogs.filter(b => 
+      !b.authorEmail || 
+      b.authorEmail.toLowerCase() === currentUser.email.toLowerCase() ||
+      b.author.toLowerCase() === currentUser.name.toLowerCase()
+    );
+  }
+
   let blogToDeleteId = null;
 
   function updateStats() {
@@ -503,17 +721,18 @@ async function initDashboardPage() {
         tableBody.innerHTML = `
           <tr>
             <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-muted);">
-              No blogs match your filter criteria.
+              No articles match your dashboard filter criteria.
             </td>
           </tr>
         `;
       } else {
         filtered.forEach(blog => {
+          const blogId = blog._id || blog.id;
           const tr = document.createElement('tr');
           const isPublished = blog.status === 'Published';
           tr.innerHTML = `
             <td>
-              <span class="table-blog-title">${blog.title}</span>
+              <a href="blog-detail.html?id=${blogId}" class="table-blog-title">${blog.title}</a>
             </td>
             <td><span class="hero-card-tag" style="font-size: 0.75rem;">${blog.category}</span></td>
             <td>
@@ -525,8 +744,9 @@ async function initDashboardPage() {
             <td>${blog.views ? blog.views.toLocaleString() : 0}</td>
             <td>
               <div class="action-buttons">
-                <button class="btn-icon view-blog-btn" data-id="${blog.id}" title="View Blog">👁️</button>
-                <button class="btn-icon delete-btn delete-blog-trigger" data-id="${blog.id}" title="Delete Blog">🗑️</button>
+                <a href="blog-detail.html?id=${blogId}" class="btn-icon" title="View Blog">👁️</a>
+                <button class="btn-icon edit-blog-btn" data-id="${blogId}" title="Edit Blog">✏️</button>
+                <button class="btn-icon delete-btn delete-blog-trigger" data-id="${blogId}" title="Delete Blog">🗑️</button>
               </div>
             </td>
           `;
@@ -540,11 +760,12 @@ async function initDashboardPage() {
       if (filtered.length === 0) {
         mobileCardsContainer.innerHTML = `
           <div style="text-align: center; padding: 2rem; background: var(--bg-surface); border-radius: var(--radius-lg); border: 1px dashed var(--border-color); color: var(--text-muted);">
-            No blogs found.
+            No articles found.
           </div>
         `;
       } else {
         filtered.forEach(blog => {
+          const blogId = blog._id || blog.id;
           const card = document.createElement('div');
           card.className = 'dashboard-mobile-card';
           const isPublished = blog.status === 'Published';
@@ -561,8 +782,9 @@ async function initDashboardPage() {
               <span>👁️ ${blog.views || 0} views</span>
             </div>
             <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
-              <button class="btn btn-secondary btn-sm btn-block view-blog-btn" data-id="${blog.id}">View</button>
-              <button class="btn btn-danger btn-sm delete-blog-trigger" data-id="${blog.id}">Delete</button>
+              <a href="blog-detail.html?id=${blogId}" class="btn btn-secondary btn-sm btn-block">View Article</a>
+              <button class="btn btn-outline btn-sm edit-blog-btn" data-id="${blogId}">Edit</button>
+              <button class="btn btn-danger btn-sm delete-blog-trigger" data-id="${blogId}">Delete</button>
             </div>
           `;
           mobileCardsContainer.appendChild(card);
@@ -570,8 +792,8 @@ async function initDashboardPage() {
       }
     }
 
-    document.querySelectorAll('.view-blog-btn').forEach(btn => {
-      btn.addEventListener('click', () => openBlogModal(btn.getAttribute('data-id')));
+    document.querySelectorAll('.edit-blog-btn').forEach(btn => {
+      btn.addEventListener('click', () => openEditBlogModal(btn.getAttribute('data-id')));
     });
 
     document.querySelectorAll('.delete-blog-trigger').forEach(btn => {
@@ -582,6 +804,101 @@ async function initDashboardPage() {
     });
 
     updateStats();
+  }
+
+  function openEditBlogModal(blogId) {
+    const blog = blogs.find(b => (b._id === blogId || b.id === blogId));
+    if (!blog) return;
+
+    let modal = document.getElementById('edit-blog-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'edit-blog-modal';
+      modal.className = 'modal-backdrop';
+      document.body.appendChild(modal);
+    }
+
+    modal.innerHTML = `
+      <div class="modal-box modal-lg">
+        <div class="modal-header">
+          <h3>Edit Article — ${blog.title}</h3>
+          <button class="modal-close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form id="edit-blog-form">
+            <div class="form-group">
+              <label class="form-label">Blog Title</label>
+              <input type="text" id="edit-title" class="form-input" value="${blog.title}" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Category</label>
+              <select id="edit-category" class="filter-select" style="width: 100%;">
+                <option value="Technology" ${blog.category==='Technology'?'selected':''}>Technology</option>
+                <option value="Web Development" ${blog.category==='Web Development'?'selected':''}>Web Development</option>
+                <option value="Programming" ${blog.category==='Programming'?'selected':''}>Programming</option>
+                <option value="Career" ${blog.category==='Career'?'selected':''}>Career</option>
+                <option value="Design" ${blog.category==='Design'?'selected':''}>Design</option>
+                <option value="Education" ${blog.category==='Education'?'selected':''}>Education</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Short Description</label>
+              <textarea id="edit-desc" class="form-input" rows="3" required>${blog.description}</textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Content</label>
+              <textarea id="edit-content" class="form-input" rows="6" required>${blog.content}</textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Status</label>
+              <select id="edit-status" class="filter-select" style="width: 100%;">
+                <option value="Published" ${blog.status==='Published'?'selected':''}>Published</option>
+                <option value="Draft" ${blog.status==='Draft'?'selected':''}>Draft</option>
+              </select>
+            </div>
+            <div class="modal-footer" style="padding: 1rem 0 0 0; background: none; border: none;">
+              <button type="button" class="btn btn-secondary cancel-edit-btn">Cancel</button>
+              <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    `;
+
+    modal.classList.add('active');
+    const closeModal = () => modal.classList.remove('active');
+
+    modal.querySelectorAll('.modal-close-btn, .cancel-edit-btn').forEach(b => b.addEventListener('click', closeModal));
+
+    const editForm = modal.querySelector('#edit-blog-form');
+    editForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const updatedData = {
+        title: document.getElementById('edit-title').value.trim(),
+        category: document.getElementById('edit-category').value,
+        description: document.getElementById('edit-desc').value.trim(),
+        content: document.getElementById('edit-content').value.trim(),
+        status: document.getElementById('edit-status').value
+      };
+
+      const token = localStorage.getItem('blog_token');
+      try {
+        await fetch(`${API_URL}/blogs/${blogId}`, {
+          method: 'PUT',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': token ? `Bearer ${token}` : ''
+          },
+          body: JSON.stringify(updatedData)
+        });
+      } catch (err) {}
+
+      blogs = blogs.map(b => (b._id === blogId || b.id === blogId) ? { ...b, ...updatedData } : b);
+      saveStoredBlogsSync(blogs);
+      renderDashboardItems();
+      showToast('Article updated successfully!', 'success');
+      closeModal();
+    });
   }
 
   function openDeleteConfirmModal() {
@@ -617,11 +934,15 @@ async function initDashboardPage() {
     const confirmBtn = modal.querySelector('.confirm-delete-btn');
     confirmBtn.addEventListener('click', async () => {
       if (blogToDeleteId) {
+        const token = localStorage.getItem('blog_token');
         try {
-          await fetch(`${API_URL}/blogs/${blogToDeleteId}`, { method: 'DELETE' });
+          await fetch(`${API_URL}/blogs/${blogToDeleteId}`, { 
+            method: 'DELETE',
+            headers: { 'Authorization': token ? `Bearer ${token}` : '' }
+          });
         } catch (e) {}
 
-        blogs = blogs.filter(b => b.id !== blogToDeleteId);
+        blogs = blogs.filter(b => (b._id !== blogToDeleteId && b.id !== blogToDeleteId));
         saveStoredBlogsSync(blogs);
         renderDashboardItems();
         showToast('Blog post deleted successfully.', 'success');
@@ -640,7 +961,7 @@ async function initDashboardPage() {
   renderDashboardItems();
 }
 
-// Create Blog Page Logic with Backend Integration
+// Create Blog Page Logic with Author Tracking
 function initCreateBlogPage() {
   const createForm = document.getElementById('create-blog-form');
   if (!createForm) return;
@@ -672,6 +993,7 @@ function initCreateBlogPage() {
   createForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
+    const currentUser = getLoggedInUser();
     const title = document.getElementById('blog-title').value.trim();
     const category = document.getElementById('blog-category').value;
     const description = descInput.value.trim();
@@ -685,12 +1007,17 @@ function initCreateBlogPage() {
       return;
     }
 
+    const token = localStorage.getItem('blog_token');
+    const authorAvatar = currentUser ? (currentUser.avatar || (currentUser.gender === 'Female' ? 'female.jpg' : 'male.jpg')) : 'male.jpg';
     const newBlog = {
       title,
       category,
       description,
       content,
       image,
+      author: currentUser ? currentUser.name : 'Alex Morgan',
+      authorEmail: currentUser ? currentUser.email : 'alex@example.com',
+      authorAvatar: authorAvatar,
       status: statusSelect,
       tags: tagsStr.split(',').map(t => t.trim()).filter(Boolean)
     };
@@ -698,21 +1025,22 @@ function initCreateBlogPage() {
     try {
       const res = await fetch(`${API_URL}/blogs`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : ''
+        },
         body: JSON.stringify(newBlog)
       });
       const json = await res.json();
       if (res.ok && json.success) {
-        showToast('Blog post created successfully on backend API! Redirecting...', 'success');
+        showToast('Blog post created successfully! Redirecting...', 'success');
         setTimeout(() => window.location.href = 'dashboard.html', 1200);
         return;
       }
     } catch (err) {
-      // Fallback local save
       const blogs = getStoredBlogsSync();
       newBlog.id = 'blog_' + Date.now();
-      newBlog.author = 'Alex Morgan';
-      newBlog.authorAvatar = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80';
+      newBlog.authorAvatar = authorAvatar;
       newBlog.date = 'Today';
       blogs.unshift(newBlog);
       saveStoredBlogsSync(blogs);
@@ -723,6 +1051,7 @@ function initCreateBlogPage() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  checkRouteProtection();
   initNavigation();
   initHomePage();
   initLoginPage();

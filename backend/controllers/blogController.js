@@ -1,59 +1,51 @@
 const fs = require('fs');
 const path = require('path');
 const Blog = require('../models/Blog');
-const { getIsConnected } = require('../config/db');
 
 const blogsFilePath = path.join(__dirname, '../data/blogs.json');
 
-// Helper to read blogs from JSON file
-function getJsonBlogs() {
+function getBlogsFromFile() {
   try {
-    const data = fs.readFileSync(blogsFilePath, 'utf8');
-    return JSON.parse(data);
+    return JSON.parse(fs.readFileSync(blogsFilePath, 'utf8'));
   } catch (err) {
     return [];
   }
 }
 
-function saveJsonBlogs(blogs) {
-  try {
-    fs.writeFileSync(blogsFilePath, JSON.stringify(blogs, null, 2), 'utf8');
-  } catch (err) {
-    console.error('Error saving blogs JSON:', err.message);
-  }
+function saveBlogsToFile(blogs) {
+  fs.writeFileSync(blogsFilePath, JSON.stringify(blogs, null, 2), 'utf8');
 }
 
-// @desc   Get all blogs (with search, category, status filter)
+// @desc   Get all blogs from MongoDB (with category, status, and search filters)
 // @route  GET /api/blogs
 exports.getAllBlogs = async (req, res) => {
   try {
     const { category, search, status } = req.query;
 
-    if (getIsConnected()) {
-      let query = {};
-      if (category && category !== 'All') {
-        query.category = { $regex: new RegExp(`^${category}$`, 'i') };
-      }
-      if (status && status !== 'All') {
-        query.status = { $regex: new RegExp(`^${status}$`, 'i') };
-      }
+    try {
+      const filter = {};
+      if (category && category !== 'All') filter.category = new RegExp(`^${category}$`, 'i');
+      if (status && status !== 'All') filter.status = new RegExp(`^${status}$`, 'i');
       if (search) {
-        query.$or = [
-          { title: { $regex: search, $options: 'i' } },
-          { description: { $regex: search, $options: 'i' } },
-          { category: { $regex: search, $options: 'i' } }
+        filter.$or = [
+          { title: new RegExp(search, 'i') },
+          { description: new RegExp(search, 'i') },
+          { category: new RegExp(search, 'i') }
         ];
       }
-      const dbBlogs = await Blog.find(query).sort({ createdAt: -1 });
-      return res.status(200).json({
-        success: true,
-        count: dbBlogs.length,
-        data: dbBlogs.map(b => ({ ...b.toObject(), id: b._id.toString() }))
-      });
-    }
 
-    // JSON Fallback
-    let blogs = getJsonBlogs();
+      const dbBlogs = await Blog.find(filter).sort({ createdAt: -1 });
+      if (dbBlogs && dbBlogs.length > 0) {
+        return res.status(200).json({
+          success: true,
+          count: dbBlogs.length,
+          data: dbBlogs
+        });
+      }
+    } catch (dbErr) {}
+
+    // Fallback JSON DB
+    let blogs = getBlogsFromFile();
     if (category && category !== 'All') {
       blogs = blogs.filter(b => b.category.toLowerCase() === category.toLowerCase());
     }
@@ -61,53 +53,50 @@ exports.getAllBlogs = async (req, res) => {
       blogs = blogs.filter(b => b.status.toLowerCase() === status.toLowerCase());
     }
     if (search) {
-      const q = search.toLowerCase();
+      const query = search.toLowerCase();
       blogs = blogs.filter(b =>
-        b.title.toLowerCase().includes(q) ||
-        b.description.toLowerCase().includes(q) ||
-        b.category.toLowerCase().includes(q)
+        b.title.toLowerCase().includes(query) ||
+        b.description.toLowerCase().includes(query) ||
+        b.category.toLowerCase().includes(query)
       );
     }
-    return res.status(200).json({
+
+    res.status(200).json({
       success: true,
       count: blogs.length,
       data: blogs
     });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Server Error fetching blogs', error: err.message });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error retrieving blogs.', error: error.message });
   }
 };
 
-// @desc   Get single blog by ID
+// @desc   Get single blog by ID & increment view count
 // @route  GET /api/blogs/:id
 exports.getBlogById = async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id;
 
-    if (getIsConnected()) {
-      let blog = null;
-      if (id.match(/^[0-9a-fA-F]{24}$/)) {
-        blog = await Blog.findById(id);
-      } else {
-        blog = await Blog.findOne({ _id: id });
-      }
+    try {
+      const blog = await Blog.findByIdAndUpdate(id, { $inc: { views: 1 } }, { new: true });
       if (blog) {
-        return res.status(200).json({
-          success: true,
-          data: { ...blog.toObject(), id: blog._id.toString() }
-        });
+        return res.status(200).json({ success: true, data: blog });
       }
-    }
+    } catch (dbErr) {}
 
-    // Fallback search
-    const blogs = getJsonBlogs();
-    const found = blogs.find(b => b.id === id);
-    if (!found) {
+    const blogs = getBlogsFromFile();
+    const blog = blogs.find(b => b.id === id);
+
+    if (!blog) {
       return res.status(404).json({ success: false, message: 'Blog post not found.' });
     }
-    return res.status(200).json({ success: true, data: found });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Error retrieving article', error: err.message });
+
+    blog.views = (blog.views || 0) + 1;
+    saveBlogsToFile(blogs);
+
+    res.status(200).json({ success: true, data: blog });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error fetching blog details.', error: error.message });
   }
 };
 
@@ -121,53 +110,107 @@ exports.createBlog = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Please provide Title, Description, and Content.' });
     }
 
-    const blogData = {
+    try {
+      const authorAvatar = req.body.authorAvatar || 'male.jpg';
+      const dbBlog = await Blog.create({
+        title: title.trim(),
+        category: category || 'Technology',
+        description: description.trim(),
+        content: content.trim(),
+        author: author || 'Alex Morgan',
+        authorAvatar: authorAvatar,
+        image: image || 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=800&q=80',
+        status: status || 'Published',
+        readTime: `${Math.ceil(content.split(' ').length / 200)} min read`,
+        tags: Array.isArray(tags) ? tags : (tags ? tags.split(',').map(t => t.trim()) : [])
+      });
+
+      return res.status(201).json({
+        success: true,
+        message: 'Blog post created successfully in MongoDB!',
+        data: dbBlog
+      });
+    } catch (dbErr) {}
+
+    const blogs = getBlogsFromFile();
+    const newBlog = {
+      id: 'blog_' + Date.now(),
       title: title.trim(),
       category: category || 'Technology',
       description: description.trim(),
       content: content.trim(),
       author: author || 'Alex Morgan',
-      authorAvatar: 'praveen photo.jpeg',
+      authorAvatar: req.body.authorAvatar || 'male.jpg',
       date: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
       readTime: `${Math.ceil(content.split(' ').length / 200)} min read`,
       image: image || 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=800&q=80',
       status: status || 'Published',
       views: 0,
-      tags: Array.isArray(tags) ? tags : (tags ? tags.split(',').map(t => t.trim()).filter(Boolean) : [])
+      tags: Array.isArray(tags) ? tags : (tags ? tags.split(',').map(t => t.trim()) : [])
     };
 
-    if (getIsConnected()) {
-      const dbBlog = await Blog.create(blogData);
-      const blogObj = { ...dbBlog.toObject(), id: dbBlog._id.toString() };
-      
-      // Sync to JSON file too
-      const jsonBlogs = getJsonBlogs();
-      jsonBlogs.unshift(blogObj);
-      saveJsonBlogs(jsonBlogs);
+    blogs.unshift(newBlog);
+    saveBlogsToFile(blogs);
 
-      return res.status(201).json({
-        success: true,
-        message: 'Blog post created successfully in MongoDB!',
-        data: blogObj
-      });
-    }
-
-    // JSON Fallback
-    const jsonBlogs = getJsonBlogs();
-    const newBlog = {
-      id: 'blog_' + Date.now(),
-      ...blogData
-    };
-    jsonBlogs.unshift(newBlog);
-    saveJsonBlogs(jsonBlogs);
-
-    return res.status(201).json({
+    res.status(201).json({
       success: true,
       message: 'Blog post created successfully!',
       data: newBlog
     });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Error creating blog post', error: err.message });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error creating blog.', error: error.message });
+  }
+};
+
+// @desc   Update blog post by ID
+// @route  PUT /api/blogs/:id
+exports.updateBlog = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { title, category, description, content, image, status, tags } = req.body;
+
+    try {
+      const updatedDbBlog = await Blog.findByIdAndUpdate(
+        id,
+        { title, category, description, content, image, status, tags },
+        { new: true, runValidators: true }
+      );
+      if (updatedDbBlog) {
+        return res.status(200).json({
+          success: true,
+          message: 'Blog post updated successfully in MongoDB!',
+          data: updatedDbBlog
+        });
+      }
+    } catch (dbErr) {}
+
+    let blogs = getBlogsFromFile();
+    const blogIndex = blogs.findIndex(b => b.id === id);
+
+    if (blogIndex === -1) {
+      return res.status(404).json({ success: false, message: 'Blog post not found.' });
+    }
+
+    blogs[blogIndex] = {
+      ...blogs[blogIndex],
+      title: title || blogs[blogIndex].title,
+      category: category || blogs[blogIndex].category,
+      description: description || blogs[blogIndex].description,
+      content: content || blogs[blogIndex].content,
+      image: image || blogs[blogIndex].image,
+      status: status || blogs[blogIndex].status,
+      tags: tags || blogs[blogIndex].tags
+    };
+
+    saveBlogsToFile(blogs);
+
+    res.status(200).json({
+      success: true,
+      message: 'Blog post updated successfully!',
+      data: blogs[blogIndex]
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error updating blog.', error: error.message });
   }
 };
 
@@ -175,21 +218,30 @@ exports.createBlog = async (req, res) => {
 // @route  DELETE /api/blogs/:id
 exports.deleteBlog = async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = req.params.id;
 
-    if (getIsConnected() && id.match(/^[0-9a-fA-F]{24}$/)) {
-      await Blog.findByIdAndDelete(id);
+    try {
+      const deletedBlog = await Blog.findByIdAndDelete(id);
+      if (deletedBlog) {
+        return res.status(200).json({ success: true, message: 'Blog post deleted from MongoDB.' });
+      }
+    } catch (dbErr) {}
+
+    let blogs = getBlogsFromFile();
+    const blogIndex = blogs.findIndex(b => b.id === id);
+
+    if (blogIndex === -1) {
+      return res.status(404).json({ success: false, message: 'Blog post not found.' });
     }
 
-    let jsonBlogs = getJsonBlogs();
-    jsonBlogs = jsonBlogs.filter(b => b.id !== id);
-    saveJsonBlogs(jsonBlogs);
+    blogs.splice(blogIndex, 1);
+    saveBlogsToFile(blogs);
 
-    return res.status(200).json({
+    res.status(200).json({
       success: true,
       message: 'Blog post deleted successfully.'
     });
-  } catch (err) {
-    res.status(500).json({ success: false, message: 'Error deleting blog post', error: err.message });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server error deleting blog.', error: error.message });
   }
 };
