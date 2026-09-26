@@ -6,18 +6,13 @@
  * - Profile & Logout: Dynamic navbar user menu & session clear
  */
 
-// ==========================================================================
-// STEP 3: API URL Configuration
-// - Local: Connects to Express on http://localhost:5000/api
-// - Production (Render / Vercel / Netlify): Uses live backend URL or relative /api
-// ==========================================================================
-const PROD_API_URL = ''; // e.g. 'https://devpulse-api.onrender.com/api'
+// Dynamic API URL: Uses localhost for local dev, and Render backend when deployed
+const isLocalEnv = window.location.hostname === 'localhost' || 
+                   window.location.hostname === '127.0.0.1';
 
-const API_URL = PROD_API_URL || (
-  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:')
-    ? 'http://localhost:5000/api'
-    : (window.location.origin + '/api')
-);
+const API_URL = isLocalEnv 
+  ? 'http://localhost:5000/api' 
+  : 'https://devpulse-backend-nlm0.onrender.com/api';
 
 const INITIAL_BLOGS = [
   {
@@ -142,7 +137,7 @@ function showToast(message, type = 'info', duration = 3500) {
 
   const toast = document.createElement('div');
   toast.className = `toast toast-${type}`;
-  
+
   let icon = 'ℹ️';
   if (type === 'success') icon = '✅';
   if (type === 'error') icon = '❌';
@@ -270,8 +265,8 @@ async function initHomePage() {
 
     const filtered = blogs.filter(blog => {
       const matchesCategory = (activeCategory === 'All') || (blog.category.toLowerCase() === activeCategory.toLowerCase());
-      const matchesSearch = blog.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                            blog.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = blog.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        blog.description.toLowerCase().includes(searchQuery.toLowerCase());
       return matchesCategory && matchesSearch;
     });
 
@@ -398,10 +393,7 @@ function initLoginPage() {
         return;
       }
     } catch (err) {
-      showToast('Login successful (Offline mode)! Redirecting...', 'success');
-      localStorage.setItem('blog_token', 'mock_offline_jwt_token');
-      localStorage.setItem('blog_user', JSON.stringify({ name: 'Alex Morgan', email }));
-      setTimeout(() => window.location.href = 'dashboard.html', 1200);
+      showToast('Unable to connect to server. If on Render, please wait ~30s for the server to wake up and try again.', 'error');
     }
   });
 }
@@ -488,12 +480,12 @@ function initRegisterPage() {
       const res = await fetch(`${API_URL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          name: fullName, 
-          email, 
-          password, 
-          gender, 
-          avatar: defaultAvatar 
+        body: JSON.stringify({
+          name: fullName,
+          email,
+          password,
+          gender,
+          avatar: defaultAvatar
         })
       });
       const data = await res.json();
@@ -506,14 +498,7 @@ function initRegisterPage() {
         showToast(data.message || 'Registration failed', 'error');
       }
     } catch (err) {
-      localStorage.setItem('blog_user', JSON.stringify({ 
-        name: fullName, 
-        email, 
-        gender, 
-        avatar: defaultAvatar 
-      }));
-      showToast('Registration successful! Redirecting to login...', 'success');
-      setTimeout(() => window.location.href = 'login.html', 1200);
+      showToast('Unable to connect to registration server. Please wait a moment and try again.', 'error');
     }
   });
 }
@@ -532,7 +517,7 @@ async function initDashboardPage() {
     const welcomeElem = document.getElementById('dashboard-user-name');
     const emailElem = document.getElementById('dashboard-user-email');
     const avatarElem = document.getElementById('dashboard-user-avatar');
-    
+
     if (welcomeElem) welcomeElem.textContent = `Welcome back, ${user.name} 👋`;
     if (emailElem) emailElem.textContent = user.email || 'author@devpulse.com';
     const avatarSrc = user.avatar || (user.gender === 'Female' ? 'female.jpg' : 'male.jpg');
@@ -690,8 +675,8 @@ async function initDashboardPage() {
   // Filter blogs created by or associated with logged-in user
   let blogs = allBlogs;
   if (currentUser) {
-    blogs = allBlogs.filter(b => 
-      !b.authorEmail || 
+    blogs = allBlogs.filter(b =>
+      !b.authorEmail ||
       b.authorEmail.toLowerCase() === currentUser.email.toLowerCase() ||
       b.author.toLowerCase() === currentUser.name.toLowerCase()
     );
@@ -844,12 +829,12 @@ async function initDashboardPage() {
             <div class="form-group">
               <label class="form-label">Category</label>
               <select id="edit-category" class="filter-select" style="width: 100%;">
-                <option value="Technology" ${blog.category==='Technology'?'selected':''}>Technology</option>
-                <option value="Web Development" ${blog.category==='Web Development'?'selected':''}>Web Development</option>
-                <option value="Programming" ${blog.category==='Programming'?'selected':''}>Programming</option>
-                <option value="Career" ${blog.category==='Career'?'selected':''}>Career</option>
-                <option value="Design" ${blog.category==='Design'?'selected':''}>Design</option>
-                <option value="Education" ${blog.category==='Education'?'selected':''}>Education</option>
+                <option value="Technology" ${blog.category === 'Technology' ? 'selected' : ''}>Technology</option>
+                <option value="Web Development" ${blog.category === 'Web Development' ? 'selected' : ''}>Web Development</option>
+                <option value="Programming" ${blog.category === 'Programming' ? 'selected' : ''}>Programming</option>
+                <option value="Career" ${blog.category === 'Career' ? 'selected' : ''}>Career</option>
+                <option value="Design" ${blog.category === 'Design' ? 'selected' : ''}>Design</option>
+                <option value="Education" ${blog.category === 'Education' ? 'selected' : ''}>Education</option>
               </select>
             </div>
             <div class="form-group">
@@ -863,8 +848,8 @@ async function initDashboardPage() {
             <div class="form-group">
               <label class="form-label">Status</label>
               <select id="edit-status" class="filter-select" style="width: 100%;">
-                <option value="Published" ${blog.status==='Published'?'selected':''}>Published</option>
-                <option value="Draft" ${blog.status==='Draft'?'selected':''}>Draft</option>
+                <option value="Published" ${blog.status === 'Published' ? 'selected' : ''}>Published</option>
+                <option value="Draft" ${blog.status === 'Draft' ? 'selected' : ''}>Draft</option>
               </select>
             </div>
             <div class="modal-footer" style="padding: 1rem 0 0 0; background: none; border: none;">
@@ -896,13 +881,13 @@ async function initDashboardPage() {
       try {
         await fetch(`${API_URL}/blogs/${blogId}`, {
           method: 'PUT',
-          headers: { 
+          headers: {
             'Content-Type': 'application/json',
             'Authorization': token ? `Bearer ${token}` : ''
           },
           body: JSON.stringify(updatedData)
         });
-      } catch (err) {}
+      } catch (err) { }
 
       blogs = blogs.map(b => (b._id === blogId || b.id === blogId) ? { ...b, ...updatedData } : b);
       saveStoredBlogsSync(blogs);
@@ -947,11 +932,11 @@ async function initDashboardPage() {
       if (blogToDeleteId) {
         const token = localStorage.getItem('blog_token');
         try {
-          await fetch(`${API_URL}/blogs/${blogToDeleteId}`, { 
+          await fetch(`${API_URL}/blogs/${blogToDeleteId}`, {
             method: 'DELETE',
             headers: { 'Authorization': token ? `Bearer ${token}` : '' }
           });
-        } catch (e) {}
+        } catch (e) { }
 
         blogs = blogs.filter(b => (b._id !== blogToDeleteId && b.id !== blogToDeleteId));
         saveStoredBlogsSync(blogs);
@@ -1036,7 +1021,7 @@ function initCreateBlogPage() {
     try {
       const res = await fetch(`${API_URL}/blogs`, {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Authorization': token ? `Bearer ${token}` : ''
         },
