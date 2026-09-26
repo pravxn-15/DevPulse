@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const mongoose = require('mongoose');
 const Blog = require('../models/Blog');
 
 const blogsFilePath = path.join(__dirname, '../data/blogs.json');
@@ -22,27 +23,29 @@ exports.getAllBlogs = async (req, res) => {
   try {
     const { category, search, status } = req.query;
 
-    try {
-      const filter = {};
-      if (category && category !== 'All') filter.category = new RegExp(`^${category}$`, 'i');
-      if (status && status !== 'All') filter.status = new RegExp(`^${status}$`, 'i');
-      if (search) {
-        filter.$or = [
-          { title: new RegExp(search, 'i') },
-          { description: new RegExp(search, 'i') },
-          { category: new RegExp(search, 'i') }
-        ];
-      }
+    if (mongoose.connection.readyState === 1) {
+      try {
+        const filter = {};
+        if (category && category !== 'All') filter.category = new RegExp(`^${category}$`, 'i');
+        if (status && status !== 'All') filter.status = new RegExp(`^${status}$`, 'i');
+        if (search) {
+          filter.$or = [
+            { title: new RegExp(search, 'i') },
+            { description: new RegExp(search, 'i') },
+            { category: new RegExp(search, 'i') }
+          ];
+        }
 
-      const dbBlogs = await Blog.find(filter).sort({ createdAt: -1 });
-      if (dbBlogs && dbBlogs.length > 0) {
-        return res.status(200).json({
-          success: true,
-          count: dbBlogs.length,
-          data: dbBlogs
-        });
-      }
-    } catch (dbErr) {}
+        const dbBlogs = await Blog.find(filter).sort({ createdAt: -1 });
+        if (dbBlogs && dbBlogs.length > 0) {
+          return res.status(200).json({
+            success: true,
+            count: dbBlogs.length,
+            data: dbBlogs
+          });
+        }
+      } catch (dbErr) {}
+    }
 
     // Fallback JSON DB
     let blogs = getBlogsFromFile();
@@ -77,15 +80,17 @@ exports.getBlogById = async (req, res) => {
   try {
     const id = req.params.id;
 
-    try {
-      const blog = await Blog.findByIdAndUpdate(id, { $inc: { views: 1 } }, { new: true });
-      if (blog) {
-        return res.status(200).json({ success: true, data: blog });
-      }
-    } catch (dbErr) {}
+    if (mongoose.connection.readyState === 1) {
+      try {
+        const blog = await Blog.findByIdAndUpdate(id, { $inc: { views: 1 } }, { new: true });
+        if (blog) {
+          return res.status(200).json({ success: true, data: blog });
+        }
+      } catch (dbErr) {}
+    }
 
     const blogs = getBlogsFromFile();
-    const blog = blogs.find(b => b.id === id);
+    const blog = blogs.find(b => (b.id === id || b._id === id));
 
     if (!blog) {
       return res.status(404).json({ success: false, message: 'Blog post not found.' });
@@ -104,33 +109,37 @@ exports.getBlogById = async (req, res) => {
 // @route  POST /api/blogs
 exports.createBlog = async (req, res) => {
   try {
-    const { title, category, description, content, image, tags, status, author } = req.body;
+    const { title, category, description, content, image, tags, status, author, authorEmail } = req.body;
 
     if (!title || !description || !content) {
       return res.status(400).json({ success: false, message: 'Please provide Title, Description, and Content.' });
     }
 
-    try {
-      const authorAvatar = req.body.authorAvatar || 'male.jpg';
-      const dbBlog = await Blog.create({
-        title: title.trim(),
-        category: category || 'Technology',
-        description: description.trim(),
-        content: content.trim(),
-        author: author || 'Alex Morgan',
-        authorAvatar: authorAvatar,
-        image: image || 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=800&q=80',
-        status: status || 'Published',
-        readTime: `${Math.ceil(content.split(' ').length / 200)} min read`,
-        tags: Array.isArray(tags) ? tags : (tags ? tags.split(',').map(t => t.trim()) : [])
-      });
+    const authorAvatar = req.body.authorAvatar || 'male.jpg';
 
-      return res.status(201).json({
-        success: true,
-        message: 'Blog post created successfully in MongoDB!',
-        data: dbBlog
-      });
-    } catch (dbErr) {}
+    if (mongoose.connection.readyState === 1) {
+      try {
+        const dbBlog = await Blog.create({
+          title: title.trim(),
+          category: category || 'Technology',
+          description: description.trim(),
+          content: content.trim(),
+          author: author || 'Alex Morgan',
+          authorEmail: (authorEmail || '').trim().toLowerCase(),
+          authorAvatar: authorAvatar,
+          image: image || 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=800&q=80',
+          status: status || 'Published',
+          readTime: `${Math.ceil(content.split(' ').length / 200)} min read`,
+          tags: Array.isArray(tags) ? tags : (tags ? tags.split(',').map(t => t.trim()) : [])
+        });
+
+        return res.status(201).json({
+          success: true,
+          message: 'Blog post created successfully in MongoDB!',
+          data: dbBlog
+        });
+      } catch (dbErr) {}
+    }
 
     const blogs = getBlogsFromFile();
     const newBlog = {
@@ -140,7 +149,8 @@ exports.createBlog = async (req, res) => {
       description: description.trim(),
       content: content.trim(),
       author: author || 'Alex Morgan',
-      authorAvatar: req.body.authorAvatar || 'male.jpg',
+      authorEmail: (authorEmail || '').trim().toLowerCase(),
+      authorAvatar: authorAvatar,
       date: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
       readTime: `${Math.ceil(content.split(' ').length / 200)} min read`,
       image: image || 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=800&q=80',

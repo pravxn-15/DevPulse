@@ -1,15 +1,18 @@
 const mongoose = require('mongoose');
 
+// Disable command buffering so operations don't freeze for 30s when MongoDB is offline
+mongoose.set('bufferCommands', false);
+
 const connectDB = async () => {
-  const connUri = process.env.MONGO_URI || 'mongodb://localhost:27017/devpulse_blog';
+  const connUri = process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/devpulse';
 
   try {
     const conn = await mongoose.connect(connUri, {
-      serverSelectionTimeoutMS: 3000
+      serverSelectionTimeoutMS: 2000
     });
     console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
   } catch (err) {
-    console.log(`⚠️ MongoDB Connection Info: Running in Local Fallback Mode (${err.message})`);
+    console.log(`⚠️ MongoDB Offline: Running in Lightning Fast Fallback Mode (${err.message})`);
   }
 };
 

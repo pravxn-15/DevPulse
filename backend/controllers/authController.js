@@ -50,39 +50,41 @@ exports.registerUser = async (req, res) => {
     const userGender = gender === 'Female' ? 'Female' : (gender === 'Other' ? 'Other' : 'Male');
     const userAvatar = req.body.avatar || (userGender === 'Female' ? 'female.jpg' : 'male.jpg');
 
-    // Try MongoDB
-    try {
-      const existingDbUser = await User.findOne({ email: email.toLowerCase() });
-      if (existingDbUser) {
-        return res.status(400).json({ success: false, message: 'User with this email already exists.' });
-      }
-
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, salt);
-
-      const dbUser = await User.create({
-        name: name.trim(),
-        email: email.trim().toLowerCase(),
-        password: hashedPassword,
-        gender: userGender,
-        avatar: userAvatar
-      });
-
-      const token = generateToken(dbUser);
-
-      return res.status(201).json({
-        success: true,
-        message: 'User registered successfully!',
-        token,
-        user: { 
-          id: dbUser._id, 
-          name: dbUser.name, 
-          email: dbUser.email, 
-          gender: dbUser.gender, 
-          avatar: dbUser.avatar 
+    // Try MongoDB if connected
+    if (mongoose.connection.readyState === 1) {
+      try {
+        const existingDbUser = await User.findOne({ email: email.toLowerCase() });
+        if (existingDbUser) {
+          return res.status(400).json({ success: false, message: 'User with this email already exists.' });
         }
-      });
-    } catch (dbErr) {}
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        const dbUser = await User.create({
+          name: name.trim(),
+          email: email.trim().toLowerCase(),
+          password: hashedPassword,
+          gender: userGender,
+          avatar: userAvatar
+        });
+
+        const token = generateToken(dbUser);
+
+        return res.status(201).json({
+          success: true,
+          message: 'User registered successfully!',
+          token,
+          user: { 
+            id: dbUser._id, 
+            name: dbUser.name, 
+            email: dbUser.email, 
+            gender: dbUser.gender, 
+            avatar: dbUser.avatar 
+          }
+        });
+      } catch (dbErr) {}
+    }
 
     // Fallback JSON DB
     const users = getUsersFromFile();
@@ -137,28 +139,30 @@ exports.loginUser = async (req, res) => {
     }
 
     // Try MongoDB
-    try {
-      const dbUser = await User.findOne({ email: email.trim().toLowerCase() });
-      if (dbUser) {
-        const isMatch = await bcrypt.compare(password.trim(), dbUser.password);
-        if (isMatch) {
-          const token = generateToken(dbUser);
-          const defaultAvatar = dbUser.gender === 'Female' ? 'female.jpg' : 'male.jpg';
-          return res.status(200).json({
-            success: true,
-            message: 'Login successful!',
-            token,
-            user: { 
-              id: dbUser._id, 
-              name: dbUser.name, 
-              email: dbUser.email, 
-              gender: dbUser.gender || 'Male', 
-              avatar: dbUser.avatar || defaultAvatar 
-            }
-          });
+    if (mongoose.connection.readyState === 1) {
+      try {
+        const dbUser = await User.findOne({ email: email.trim().toLowerCase() });
+        if (dbUser) {
+          const isMatch = await bcrypt.compare(password.trim(), dbUser.password);
+          if (isMatch) {
+            const token = generateToken(dbUser);
+            const defaultAvatar = dbUser.gender === 'Female' ? 'female.jpg' : 'male.jpg';
+            return res.status(200).json({
+              success: true,
+              message: 'Login successful!',
+              token,
+              user: { 
+                id: dbUser._id, 
+                name: dbUser.name, 
+                email: dbUser.email, 
+                gender: dbUser.gender || 'Male', 
+                avatar: dbUser.avatar || defaultAvatar 
+              }
+            });
+          }
         }
-      }
-    } catch (dbErr) {}
+      } catch (dbErr) {}
+    }
 
     // Fallback JSON DB
     const users = getUsersFromFile();
@@ -216,22 +220,24 @@ exports.updateProfile = async (req, res) => {
     let updatedUser = null;
 
     // Try MongoDB
-    try {
-      const dbUser = await User.findOne({ email: userEmail });
-      if (dbUser) {
-        if (name) dbUser.name = name.trim();
-        if (avatar) dbUser.avatar = avatar.trim();
-        if (gender) dbUser.gender = gender;
-        await dbUser.save();
-        updatedUser = {
-          id: dbUser._id,
-          name: dbUser.name,
-          email: dbUser.email,
-          gender: dbUser.gender,
-          avatar: dbUser.avatar
-        };
-      }
-    } catch (dbErr) {}
+    if (mongoose.connection.readyState === 1) {
+      try {
+        const dbUser = await User.findOne({ email: userEmail });
+        if (dbUser) {
+          if (name) dbUser.name = name.trim();
+          if (avatar) dbUser.avatar = avatar.trim();
+          if (gender) dbUser.gender = gender;
+          await dbUser.save();
+          updatedUser = {
+            id: dbUser._id,
+            name: dbUser.name,
+            email: dbUser.email,
+            gender: dbUser.gender,
+            avatar: dbUser.avatar
+          };
+        }
+      } catch (dbErr) {}
+    }
 
     // Update in JSON file fallback
     const users = getUsersFromFile();
