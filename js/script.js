@@ -6,7 +6,18 @@
  * - Profile & Logout: Dynamic navbar user menu & session clear
  */
 
-const API_URL = 'http://localhost:5000/api';
+// ==========================================================================
+// STEP 3: API URL Configuration
+// - Local: Connects to Express on http://localhost:5000/api
+// - Production (Render / Vercel / Netlify): Uses live backend URL or relative /api
+// ==========================================================================
+const PROD_API_URL = ''; // e.g. 'https://devpulse-api.onrender.com/api'
+
+const API_URL = PROD_API_URL || (
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:')
+    ? 'http://localhost:5000/api'
+    : (window.location.origin + '/api')
+);
 
 const INITIAL_BLOGS = [
   {
